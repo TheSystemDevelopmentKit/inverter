@@ -102,13 +102,13 @@ class inverter(rtl,spice,thesdk):
               self.run_rtl()
           
           elif self.model=='eldo':
-              _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['IN'], rs=self.Rs, \
+              _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
                 vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
-              _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['OUT'])
+              _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['Z'])
 
               # Saving the analog waveform of the input as well
               self.IOS.Members['A_OUT']= IO()
-              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['IN'])
+              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['A'])
               #self.preserve_iofiles = True
               #self.preserve_spicefiles = True
               #self.interactive_spice = True
@@ -119,7 +119,7 @@ class inverter(rtl,spice,thesdk):
               self.spiceparameters = {
                           'exampleparam': '0'
                       }
-              self.plotlist = ['v(IN)','v(OUT)']
+              self.plotlist = ['v(A)','v(Z)']
 
               # Example of defining supplies (not used here because the example inverter has no supplies)
               #_=spice_dcsource(self,name='dd',value=self.vdd,pos='VDD',neg='VSS',extract=True,ext_start=2e-9)
@@ -161,10 +161,12 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    models=[ 'py', 'sv', 'vhdl', 'eldo' ]
+    #models=[ 'py', 'sv', 'vhdl', 'eldo' ]
+    models=[ 'eldo' ]
     duts=[]
     for model in models:
         d=inverter()
+        d.preserve_iofiles=True
         duts.append(d) 
         d.model=model
         d.Rs=rs
@@ -181,7 +183,8 @@ if __name__=="__main__":
         hfont = {'fontname':'Sans'}
         if duts[k].model == 'eldo':
             figure,axes = plt.subplots(2,1,sharex=True)
-            axes[0].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
+            print(duts[k].IOS.Members['Z'].Data)
+            axes[0].plot(duts[k].IOS.Members['A'].Data[:,0],duts[k].IOS.Members['A'].Data[:,1],label='Input')
             axes[1].plot(duts[k].IOS.Members['Z'].Data[:,0],duts[k].IOS.Members['Z'].Data[:,1],label='Output')
             axes[0].set_ylabel('Input', **hfont,fontsize=18);
             axes[1].set_ylabel('Output', **hfont,fontsize=18);
