@@ -27,13 +27,13 @@ from thesdk import *
 from rtl import *
 from rtl.testbench import *
 from rtl.testbench import testbench as vtb
-from eldo import *
-from eldo.testbench import *
-from eldo.testbench import testbench as etb 
+from spice import *
+from spice.testbench import *
+from spice.testbench import testbench as etb 
 
 import numpy as np
 
-class inverter(rtl,eldo,thesdk):
+class inverter(rtl,spice,thesdk):
     @property
     def _classfile(self):
         return os.path.dirname(os.path.realpath(__file__)) + "/"+__name__
@@ -102,32 +102,32 @@ class inverter(rtl,eldo,thesdk):
               self.run_rtl()
           
           elif self.model=='eldo':
-              _=eldo_iofile(self, name='A', dir='in', iotype='sample', ionames=['IN'], rs=self.Rs, \
+              _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['IN'], rs=self.Rs, \
                 vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
-              _=eldo_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['OUT'])
+              _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['OUT'])
 
               # Saving the analog waveform of the input as well
               self.IOS.Members['A_OUT']= IO()
-              _=eldo_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['IN'])
+              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['IN'])
               #self.preserve_iofiles = True
-              #self.preserve_eldofiles = True
-              #self.interactive_eldo = True
+              #self.preserve_spicefiles = True
+              #self.interactive_spice = True
               self.nproc = 1
-              self.eldooptions = {
+              self.spiceoptions = {
                           'eps': '1e-6'
                       }
-              self.eldoparameters = {
+              self.spiceparameters = {
                           'exampleparam': '0'
                       }
-              self.eldoplotextras = ['v(IN)','v(OUT)']
+              self.plotlist = ['v(IN)','v(OUT)']
 
               # Example of defining supplies (not used here because the example inverter has no supplies)
-              #_=eldo_dcsource(self,name='dd',value=self.vdd,pos='VDD',neg='VSS',extract=True,ext_start=2e-9)
-              #_=eldo_dcsource(self,name='ss',value=0,pos='VSS',neg='0')
+              #_=spice_dcsource(self,name='dd',value=self.vdd,pos='VDD',neg='VSS',extract=True,ext_start=2e-9)
+              #_=spice_dcsource(self,name='ss',value=0,pos='VSS',neg='0')
 
               # Simulation command
-              _=eldo_simcmd(self,sim='tran')
-              self.run_eldo()
+              _=spice_simcmd(self,sim='tran')
+              self.run_spice()
 
           if self.par:
               self.queue.put(self.IOS.Members[Z].Data)
@@ -169,7 +169,7 @@ if __name__=="__main__":
         d.model=model
         d.Rs=rs
         #d.interactive_rtl=True
-        #d.interactive_eldo=True
+        #d.interactive_spice=True
         d.IOS.Members['A'].Data=indata
         d.IOS.Members['control_write']=controller.IOS.Members['control_write']
         d.init()
