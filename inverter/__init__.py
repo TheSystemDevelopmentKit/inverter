@@ -25,11 +25,7 @@ if not (os.path.abspath('../../thesdk') in sys.path):
 
 from thesdk import *
 from rtl import *
-from rtl.testbench import *
-from rtl.testbench import testbench as vtb
 from spice import *
-from spice.testbench import *
-from spice.testbench import testbench as etb 
 
 import numpy as np
 
@@ -121,6 +117,16 @@ class inverter(rtl,spice,thesdk):
                       }
               self.plotlist = ['v(A)','v(Z)']
 
+              # Defining library options
+              # Path to model libraries needs to be defined in TheSDK.config as
+              # either ELDOLIBFILE or SPECTRELIBFILE. In this case, no model libraries
+              # will be included (assuming these variables are not defined). The
+              # temperature will be set regardless.
+              self.spicecorner = {
+                          'corner': 'top_tt',
+                          'temp': 27,
+                      }
+
               # Example of defining supplies (not used here because the example inverter has no supplies)
               #_=spice_dcsource(self,name='dd',value=self.vdd,pos='VDD',neg='VSS',extract=True,ext_start=2e-9)
               #_=spice_dcsource(self,name='ss',value=0,pos='VSS',neg='0')
@@ -131,9 +137,6 @@ class inverter(rtl,spice,thesdk):
 
           if self.par:
               self.queue.put(self.IOS.Members[Z].Data)
-
-          #Delete large iofiles
-          del self.iofile_bundle 
 
     def define_io_conditions(self):
         '''This overloads the method is called by run_rtl method. It defines the read/write conditions for the files
@@ -161,15 +164,15 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    #models=[ 'py', 'sv', 'vhdl', 'eldo' ]
-    models=[ 'eldo' ]
+    models=[ 'py', 'sv', 'vhdl', 'eldo' ]
+    #models=[ 'eldo' ]
     duts=[]
     for model in models:
         d=inverter()
-        d.preserve_iofiles=True
         duts.append(d) 
         d.model=model
         d.Rs=rs
+        #d.preserve_iofiles=True
         #d.interactive_rtl=True
         #d.interactive_spice=True
         d.IOS.Members['A'].Data=indata
@@ -183,8 +186,7 @@ if __name__=="__main__":
         hfont = {'fontname':'Sans'}
         if duts[k].model == 'eldo':
             figure,axes = plt.subplots(2,1,sharex=True)
-            print(duts[k].IOS.Members['Z'].Data)
-            axes[0].plot(duts[k].IOS.Members['A'].Data[:,0],duts[k].IOS.Members['A'].Data[:,1],label='Input')
+            axes[0].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
             axes[1].plot(duts[k].IOS.Members['Z'].Data[:,0],duts[k].IOS.Members['Z'].Data[:,1],label='Output')
             axes[0].set_ylabel('Input', **hfont,fontsize=18);
             axes[1].set_ylabel('Output', **hfont,fontsize=18);
