@@ -90,12 +90,14 @@ class inverter(rtl,spice,thesdk):
               _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
           if self.model=='vhdl':
               # VHDL simulation options here
               _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
               _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
           
           elif self.model=='eldo':
               _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
