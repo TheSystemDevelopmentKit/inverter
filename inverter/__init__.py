@@ -99,7 +99,7 @@ class inverter(rtl,spice,thesdk):
               self.run_rtl()
               self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
           
-          elif self.model=='eldo':
+          elif self.model=='eldo' or self.model=='spectre':
               _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
                 vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
               _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['Z'])
@@ -166,8 +166,8 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    models=[ 'py', 'sv', 'vhdl', 'eldo' ]
-    #models=[ 'eldo' ]
+    #models=[ 'py', 'sv', 'vhdl', 'eldo' ]
+    models=[ 'spectre' ]
     duts=[]
     for model in models:
         d=inverter()
@@ -186,7 +186,7 @@ if __name__=="__main__":
     latency=[ 0 , 1, 1, 0 ]
     for k in range(len(duts)):
         hfont = {'fontname':'Sans'}
-        if duts[k].model == 'eldo':
+        if duts[k].model == 'eldo' or duts[k].model=='spectre':
             figure,axes = plt.subplots(2,1,sharex=True)
             axes[0].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
             axes[1].plot(duts[k].IOS.Members['Z'].Data[:,0],duts[k].IOS.Members['Z'].Data[:,1],label='Output')
