@@ -117,7 +117,12 @@ class inverter(rtl,spice,thesdk):
               self.spiceparameters = {
                           'exampleparam': '0'
                       }
-              self.plotlist = ['v(A)','v(Z)']
+              
+              # Plotting nodes for interactive eldo purposes.
+              # Spectre also supported, but without 'v()' specifiers.
+              # i.e. self.plotlist = ['A','Z']
+              if self.model == 'eldo':
+                  self.plotlist = ['v(A)','v(Z)']
 
               # Defining library options
               # Path to model libraries needs to be defined in TheSDK.config as

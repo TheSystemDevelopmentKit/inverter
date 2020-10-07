@@ -8,3 +8,6 @@ doc/build/*
 *.nfs
 *.svn
 *.asv
+Simulations/
+spice/tb_*
+spice/subckt_*
