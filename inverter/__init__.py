@@ -171,8 +171,7 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    #models=[ 'py', 'sv', 'vhdl', 'eldo' ]
-    models=[ 'spectre' ]
+    models=[ 'py', 'sv', 'vhdl', 'eldo', 'spectre' ]
     duts=[]
     for model in models:
         d=inverter()
