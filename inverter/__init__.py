@@ -35,7 +35,7 @@ class inverter(rtl,spice,thesdk):
         return os.path.dirname(os.path.realpath(__file__)) + "/"+__name__
 
     def __init__(self,*arg): 
-        self.print_log(type='I', msg='Inititalizing %s' %(__name__)) 
+        self.print_log(type='I', msg='Initializing %s' %(__name__)) 
         self.proplist = [ 'Rs' ];    # Properties that can be propagated from parent
         self.Rs =  100e6;            # Sampling frequency
         self.vdd = 1.0
