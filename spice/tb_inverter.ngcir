@@ -1,0 +1,18 @@
+.title KiCad test
+
+.include ./inverter.ngcir
+
+Vvss vss 0 0
+Vin A vss AC 1 SIN(0.5 0.5 100 0 0 0)
+
+Xinv A Z inverter
+.tran 1e-5 20e-3
+.control
+set wr_singlescale
+set wr_vecnames
+run
+wrdata inverter_A.csv v(A)
+wrdata inverter_Z.csv v(Z)
+.endc
+
+.end
