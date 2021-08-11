@@ -1,8 +1,7 @@
 * This is a simple inverter model for ngspice
 
-.subckt inverter A_0_ A_1_ Z_0_ Z_1_
-a0 A_0_ Z_0_  xfer_cntl1
-a1 A_1_ Z_1_  xfer_cntl1
+.subckt inverter A Z
+a A Z  xfer_cntl1
 .model xfer_cntl1 pwl(
 +x_array=[0 0.45 0.45 1 ]
 +y_array=[ 1 1 0 0 ]
