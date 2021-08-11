@@ -165,13 +165,13 @@ class inverter(rtl,spice,thesdk):
               self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
           
           elif self.model=='eldo' or self.model=='spectre' or self.model=='ngspice':
-              _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A<1:0>'], rs=self.Rs, \
+              _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
                 vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
-              _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['Z_1_','Z_0_'])
+              _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['Z'])
 
               # Saving the analog waveform of the input as well
               self.IOS.Members['A_OUT']= IO()
-              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['A_1_', 'A_0_'])
+              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['A' ])
               #self.preserve_iofiles = True
               #self.preserve_spicefiles = True
               #self.interactive_spice = True
@@ -236,9 +236,9 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    #models=[ 'py', 'sv', 'vhdl', 'eldo', 'spectre' ]
-    models=[ 'ngspice' ]
-    #models=[ 'eldo' ]
+    models=[ 'py', 'sv', 'vhdl', 'eldo', 'spectre' ]
+    # Separate test for ngspice
+    #models=[ 'ngspice' ]
     duts=[]
     for model in models:
         d=inverter()
