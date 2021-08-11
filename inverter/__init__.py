@@ -253,8 +253,6 @@ if __name__=="__main__":
         d.init()
         d.run()
 
-    # Obs the latencies may be different
-    latency=[ 0 , 1, 1, 0 ]
     for k in range(len(duts)):
         hfont = {'fontname':'Sans'}
         if duts[k].model == 'eldo' or duts[k].model=='spectre' or duts[k].model=='ngspice':
@@ -269,6 +267,10 @@ if __name__=="__main__":
             axes[0].grid(True)
             axes[1].grid(True)
         else:
+            if duts[k].model == 'sv' or duts[k].model == 'vhdl':
+                latency=1
+            else:
+                latency=0
             figure,axes=plt.subplots(2,1,sharex=True)
             x = np.linspace(0,10,11).reshape(-1,1)
             axes[0].stem(x,indata[0:11,0])
@@ -276,7 +278,7 @@ if __name__=="__main__":
             axes[0].set_xlim((np.amin(x), np.amax(x)));
             axes[0].set_ylabel('Input', **hfont,fontsize=18);
             axes[0].grid(True)
-            axes[1].stem(x, duts[k].IOS.Members['Z'].Data[0+latency[k]:11+latency[k],0])
+            axes[1].stem(x, duts[k].IOS.Members['Z'].Data[0+latency:11+latency,0])
             axes[1].set_ylim(0, 1.1);
             axes[1].set_xlim((np.amin(x), np.amax(x)));
             axes[1].set_ylabel('Output', **hfont,fontsize=18);
