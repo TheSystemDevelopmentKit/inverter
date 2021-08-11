@@ -151,18 +151,18 @@ class inverter(rtl,spice,thesdk):
         else: 
           if self.model=='sv':
               # Verilog simulation options here
-              _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A<1:0>'], datatype='sint') # IO file for input A
-              _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z<1:0>'], datatype='sint')
+              _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
+              _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
-              self.IOS.Members['Z'].Data=(self.IOS.Members['Z'].Data[:,0].astype(int)*1+self.IOS.Members['Z'].Data[:,1].astype(int)).reshape(-1,1)
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
           if self.model=='vhdl':
               # VHDL simulation options here
               _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
               _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
-              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
           
           elif self.model=='eldo' or self.model=='spectre' or self.model=='ngspice':
               _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
