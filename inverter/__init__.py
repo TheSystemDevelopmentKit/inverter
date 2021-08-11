@@ -155,23 +155,23 @@ class inverter(rtl,spice,thesdk):
               _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
-              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
           if self.model=='vhdl':
               # VHDL simulation options here
               _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
               _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
               self.rtlparameters=dict([ ('g_Rs',self.Rs),]) #Defines the sample rate
               self.run_rtl()
-              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int)
+              self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
           
-          elif self.model=='eldo' or self.model=='spectre':
+          elif self.model=='eldo' or self.model=='spectre' or self.model=='ngspice':
               _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], rs=self.Rs, \
                 vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
               _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames=['Z'])
 
               # Saving the analog waveform of the input as well
               self.IOS.Members['A_OUT']= IO()
-              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['A'])
+              _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames=['A' ])
               #self.preserve_iofiles = True
               #self.preserve_spicefiles = True
               #self.interactive_spice = True
@@ -237,6 +237,8 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     models=[ 'py', 'sv', 'vhdl', 'eldo', 'spectre' ]
+    # Separate test for ngspice
+    #models=[ 'ngspice' ]
     duts=[]
     for model in models:
         d=inverter()
@@ -251,11 +253,9 @@ if __name__=="__main__":
         d.init()
         d.run()
 
-    # Obs the latencies may be different
-    latency=[ 0 , 1, 1, 0 ]
     for k in range(len(duts)):
         hfont = {'fontname':'Sans'}
-        if duts[k].model == 'eldo' or duts[k].model=='spectre':
+        if duts[k].model == 'eldo' or duts[k].model=='spectre' or duts[k].model=='ngspice':
             figure,axes = plt.subplots(2,1,sharex=True)
             axes[0].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
             axes[1].plot(duts[k].IOS.Members['Z'].Data[:,0],duts[k].IOS.Members['Z'].Data[:,1],label='Output')
@@ -267,6 +267,10 @@ if __name__=="__main__":
             axes[0].grid(True)
             axes[1].grid(True)
         else:
+            if duts[k].model == 'sv' or duts[k].model == 'vhdl':
+                latency=1
+            else:
+                latency=0
             figure,axes=plt.subplots(2,1,sharex=True)
             x = np.linspace(0,10,11).reshape(-1,1)
             axes[0].stem(x,indata[0:11,0])
@@ -274,7 +278,7 @@ if __name__=="__main__":
             axes[0].set_xlim((np.amin(x), np.amax(x)));
             axes[0].set_ylabel('Input', **hfont,fontsize=18);
             axes[0].grid(True)
-            axes[1].stem(x, duts[k].IOS.Members['Z'].Data[0+latency[k]:11+latency[k],0])
+            axes[1].stem(x, duts[k].IOS.Members['Z'].Data[0+latency:11+latency,0])
             axes[1].set_ylim(0, 1.1);
             axes[1].set_xlim((np.amin(x), np.amax(x)));
             axes[1].set_ylabel('Output', **hfont,fontsize=18);
