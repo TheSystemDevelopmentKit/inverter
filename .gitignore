@@ -10,4 +10,5 @@ doc/build/*
 *.asv
 Simulations/
 spice/tb_*
+sv/tb_*
 spice/subckt_*
