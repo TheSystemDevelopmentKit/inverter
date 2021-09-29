@@ -171,7 +171,7 @@ class inverter(rtl,spice,thesdk):
                 _=spice_iofile(self, name='CLK', dir='in', iotype='sample', ionames='CLK', rs=2*self.Rs, \
                                vhi=self.vdd, trise=1/(self.Rs*8), tfall=1/(self.Rs*8))
 
-                # Extracting values of A and Z at falling edges of CLK in decimal foramat (integer, in this case 0 or 1)
+                # Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
                 # The clock signal can be any node voltage in the simulation
                 self.IOS.Members['A_DIG'] = IO()
                 _=spice_iofile(self, name='A_DIG', dir='out', iotype='sample', ionames='A', trigger='CLK', \
@@ -181,7 +181,7 @@ class inverter(rtl,spice,thesdk):
                                vth=self.vdd/2,edgetype='rising',ioformat='dec')
 
                 # Multithreading, options and parameters
-                self.nproc = 1
+                self.nproc = 2
                 self.spiceoptions = {
                             'eps': '1e-6'
                         }
@@ -214,10 +214,12 @@ class inverter(rtl,spice,thesdk):
                 # Plotting nodes for interactive waveform viewing.
                 # Spectre also supported, but without 'v()' specifiers.
                 # i.e. plotlist = ['A','Z']
-                if self.model == 'spectre':
+                if self.model == 'eldo':
+                    plotlist = ['v(A)','v(Z)']
+                elif self.model == 'spectre':
                     plotlist = ['A','Z']
                 else:
-                    plotlist = ['v(A)','v(Z)']
+                    plotlist = []
 
                 # Simulation command
                 _=spice_simcmd(self,sim='tran',plotlist=plotlist)
@@ -239,8 +241,8 @@ class inverter(rtl,spice,thesdk):
 
 if __name__=="__main__":
     import matplotlib.pyplot as plt
-    from  inverter import *
-    from  inverter.controller import controller as inverter_controller
+    from inverter import *
+    from inverter.controller import controller as inverter_controller
     import pdb
     length=2**8
     rs=100e6
@@ -253,7 +255,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     models=['py','sv','vhdl','eldo','spectre']
-    models=['spectre']
+    #models=['ngspice']
     duts=[]
     for model in models:
         d=inverter()
@@ -261,7 +263,7 @@ if __name__=="__main__":
         d.model=model
         d.Rs=rs
         d.spice_submission=""
-        d.preserve_result=True
+        #d.preserve_result=True
         #d.interactive_spice=True
         #d.interactive_rtl=True
         d.IOS.Members['A'].Data=indata
@@ -277,11 +279,9 @@ if __name__=="__main__":
         if duts[k].model == 'eldo' or duts[k].model=='spectre' or duts[k].model=='ngspice':
             figure,axes = plt.subplots(2,2,sharex='col',tight_layout=True)
             axes[0,0].stem(x,duts[k].IOS.Members['A_DIG'].Data[:nsamp,0])
-            #axes[0,0].set_ylim(0,1.1)
             axes[0,0].set_ylabel('Input', **hfont,fontsize=18)
             axes[0,0].grid(True)
             axes[1,0].stem(x,duts[k].IOS.Members['Z_DIG'].Data[:nsamp,0])
-            #axes[1,0].set_ylim(0,1.1)
             axes[1,0].set_xlim(0,nsamp-1)
             axes[1,0].set_ylabel('Output', **hfont,fontsize=18)
             axes[1,0].set_xlabel('Sample', **hfont,fontsize=18)
