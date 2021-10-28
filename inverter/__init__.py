@@ -255,7 +255,6 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     models=['py','sv','vhdl','eldo','spectre']
-    #models=['ngspice']
     duts=[]
     for model in models:
         d=inverter()
@@ -263,9 +262,19 @@ if __name__=="__main__":
         d.model=model
         d.Rs=rs
         d.spice_submission=""
-        #d.preserve_result=True
+        # Enable debug messages
+        #d.DEBUG = True
+        # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
         #d.interactive_rtl=True
+        # Preserve the IO files or simulator files for debugging purposes
+        #d.preserve_iofiles = True
+        #d.preserve_spicefiles = True
+        # Save the entity state after simulation
+        d.save_state = True
+        d.save_database = True
+        # Optionally load the state of the most recent simulation
+        #d.load_state = 'latest'
         d.IOS.Members['A'].Data=indata
         d.IOS.Members['CLK'].Data=clk
         d.IOS.Members['control_write']=controller.IOS.Members['control_write']
@@ -300,12 +309,12 @@ if __name__=="__main__":
             else:
                 latency=0
             figure,axes=plt.subplots(2,1,sharex=True)
-            axes[0].stem(x,indata[:nsamp,0])
+            axes[0].stem(x,duts[k].IOS.Members['A'].Data[:nsamp,0])
             axes[0].set_ylim(0, 1.1)
             axes[0].set_xlim((np.amin(x), np.amax(x)))
             axes[0].set_ylabel('Input', **hfont,fontsize=18)
             axes[0].grid(True)
-            axes[1].stem(x, duts[k].IOS.Members['Z'].Data[latency:nsamp+latency,0])
+            axes[1].stem(x,duts[k].IOS.Members['Z'].Data[latency:nsamp+latency,0])
             axes[1].set_ylim(0, 1.1)
             axes[1].set_xlim((np.amin(x), np.amax(x)))
             axes[1].set_ylabel('Output', **hfont,fontsize=18)
@@ -314,7 +323,7 @@ if __name__=="__main__":
         titlestr = "Inverter model %s" %(duts[k].model) 
         plt.suptitle(titlestr,fontsize=20)
         plt.grid(True)
-        printstr="./inv_%s.eps" %(duts[k].model)
         plt.show(block=False)
-        figure.savefig(printstr, format='eps', dpi=300)
+        #printstr="../inv_%s.eps" %(duts[k].model)
+        #figure.savefig(printstr, format='eps', dpi=300)
     input()
