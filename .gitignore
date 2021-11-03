@@ -9,6 +9,7 @@ doc/build/*
 *.svn
 *.asv
 simulations/
+Simulations/
 states/
 sv/tb_*
 spice/tb_*
