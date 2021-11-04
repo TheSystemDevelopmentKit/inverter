@@ -8,7 +8,9 @@ doc/build/*
 *.nfs
 *.svn
 *.asv
+simulations/
 Simulations/
-spice/tb_*
+states/
 sv/tb_*
+spice/tb_*
 spice/subckt_*
