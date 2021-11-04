@@ -136,11 +136,22 @@ class inverter(rtl,spice,thesdk):
         if self.model=='py':
             self.main()
         else: 
+            # This defines contents of modelsim control file executed when interactive_rtl = True
+            interactive_control_contents="""
+                add wave -position insertpoint \\
+                sim/:tb_inverter:A \\
+                sim/:tb_inverter:initdone \\
+                sim/:tb_inverter:clock \\
+                sim/:tb_inverter:Z
+                run -all
+                wave zoom full
+            """
             if self.model=='sv':
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
                 _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
                 self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
+                self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
             elif self.model=='vhdl':
@@ -148,6 +159,7 @@ class inverter(rtl,spice,thesdk):
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
                 _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
                 self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
+                self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
             elif self.model in ['eldo','spectre','ngspice']:
@@ -255,6 +267,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     models=['py','sv','vhdl','eldo','spectre']
+    models=['sv']
     duts=[]
     for model in models:
         d=inverter()
@@ -263,10 +276,10 @@ if __name__=="__main__":
         d.Rs=rs
         d.spice_submission=""
         # Enable debug messages
-        #d.DEBUG = True
+        d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        #d.interactive_rtl=True
+        d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         #d.preserve_iofiles = True
         #d.preserve_spicefiles = True
