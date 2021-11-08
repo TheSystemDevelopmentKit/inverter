@@ -267,7 +267,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     models=['py','sv','vhdl','eldo','spectre']
-    models=['sv']
+    #models=['sv']
     duts=[]
     for model in models:
         d=inverter()
