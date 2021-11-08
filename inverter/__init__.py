@@ -276,10 +276,10 @@ if __name__=="__main__":
         d.Rs=rs
         d.spice_submission=""
         # Enable debug messages
-        d.DEBUG = True
+        #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        d.interactive_rtl=True
+        #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         #d.preserve_iofiles = True
         #d.preserve_spicefiles = True
