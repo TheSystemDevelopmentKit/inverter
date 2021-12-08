@@ -163,33 +163,38 @@ class inverter(rtl,spice,thesdk):
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
             elif self.model in ['eldo','spectre','ngspice']:
+
+                # Creating a clock signal, which is used for testing the sample output features
+                _=spice_iofile(self, name='CLK', dir='in', iotype='sample', ionames='CLK', rs=2*self.Rs, \
+                               vhi=self.vdd, trise=1/(self.Rs*8), tfall=1/(self.Rs*8))
                 # Sample type input
                 _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames='A', rs=self.Rs, \
                                vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
 
+                ##Analog output for inverter
+                self.IOS.Members['Z_ANA'] = IO()
+                _=spice_iofile(self, name='Z_ANA', dir='out', iotype='event', sourcetype='V', ionames='Z')
+                
                 # Sample type output
-                _=spice_iofile(self, name='Z', dir='out', iotype='event', sourcetype='V', ionames='Z')
+                # Clock is used to sample the waveform in analog simulation
+                _=spice_iofile(self, name='Z', dir='out', iotype='sample', ionames='Z', trigger='CLK', \
+                               vth=self.vdd/2,edgetype='rising',ioformat='dec')
+                
 
                 # Saving the analog waveform of the input as well
                 self.IOS.Members['A_OUT'] = IO()
                 _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames='A')
 
-                # Extracting rising edges from the output waveform
+                ## Extracting rising edges from the output waveform
                 self.IOS.Members['Z_RISE'] = IO()
                 _=spice_iofile(self, name='Z_RISE', dir='out', iotype='time', sourcetype='V', ionames='Z', \
                                edgetype='rising',vth=self.vdd/2)
 
-                # Creating a clock signal, which is used for testing the sample output features
-                _=spice_iofile(self, name='CLK', dir='in', iotype='sample', ionames='CLK', rs=2*self.Rs, \
-                               vhi=self.vdd, trise=1/(self.Rs*8), tfall=1/(self.Rs*8))
 
-                # Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
-                # The clock signal can be any node voltage in the simulation
+                ## Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
+                ## The clock signal can be any node voltage in the simulation
                 self.IOS.Members['A_DIG'] = IO()
                 _=spice_iofile(self, name='A_DIG', dir='out', iotype='sample', ionames='A', trigger='CLK', \
-                               vth=self.vdd/2,edgetype='rising',ioformat='dec')
-                self.IOS.Members['Z_DIG'] = IO()
-                _=spice_iofile(self, name='Z_DIG', dir='out', iotype='sample', ionames='Z', trigger='CLK', \
                                vth=self.vdd/2,edgetype='rising',ioformat='dec')
 
                 # Multithreading, options and parameters
@@ -266,6 +271,7 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
+    #models=['spectre']
     models=['py','sv','vhdl','eldo','spectre']
     #models=['sv']
     duts=[]
@@ -303,14 +309,14 @@ if __name__=="__main__":
             axes[0,0].stem(x,duts[k].IOS.Members['A_DIG'].Data[:nsamp,0])
             axes[0,0].set_ylabel('Input', **hfont,fontsize=18)
             axes[0,0].grid(True)
-            axes[1,0].stem(x,duts[k].IOS.Members['Z_DIG'].Data[:nsamp,0])
+            axes[1,0].stem(x,duts[k].IOS.Members['Z'].Data[:nsamp,0])
             axes[1,0].set_xlim(0,nsamp-1)
             axes[1,0].set_ylabel('Output', **hfont,fontsize=18)
             axes[1,0].set_xlabel('Sample', **hfont,fontsize=18)
             axes[1,0].grid(True)
             axes[0,1].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
             axes[0,1].grid(True)
-            axes[1,1].plot(duts[k].IOS.Members['Z'].Data[:,0],duts[k].IOS.Members['Z'].Data[:,1],label='Output')
+            axes[1,1].plot(duts[k].IOS.Members['Z_ANA'].Data[:,0],duts[k].IOS.Members['Z_ANA'].Data[:,1],label='Output')
             axes[1,1].plot(duts[k].IOS.Members['Z_RISE'].Data[:,0],np.ones(duts[k].IOS.Members['Z_RISE'].Data[:,0].shape)*duts[k].vdd/2,\
                            ls='None',marker='o',label='Rising edges')
             axes[1,1].set_xlabel('Time (s)', **hfont,fontsize=18)
