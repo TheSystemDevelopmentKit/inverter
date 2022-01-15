@@ -1,0 +1,3 @@
+verilator -Wall --cc --exe --build --trace sim_main.cpp inverter.sv
+cd obj_dir/ && ./Vinverter
+
