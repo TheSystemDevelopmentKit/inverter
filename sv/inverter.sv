@@ -1,3 +1,4 @@
+//verilator lint_off UNUSED
 module inverter( input reset,
                  input A, 
                  output Z );
@@ -5,3 +6,4 @@ module inverter( input reset,
 assign Z= !A;
 
 endmodule
+//verilator lint_on UNUSED

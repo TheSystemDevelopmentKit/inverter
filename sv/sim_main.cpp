@@ -6,7 +6,9 @@
 int main(int argc, char** argv, char** env) {
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
+    /* verilator lint_off UNUSED */
     Vinverter* top = new Vinverter(contextp);
+    /* verilator lint_on UNUSED */
     Verilated::internalsDump();
     Verilated::traceEverOn(true);
     VerilatedVcdC* tfp = new VerilatedVcdC;
@@ -19,7 +21,6 @@ int main(int argc, char** argv, char** env) {
     std::cout << "Starting the sucker!" << std::endl; 
     while (contextp->time() < 1000) { 
 		clock = !clock;
-		top->reset = 0;
 		top->A = clock;
 		top->eval(); 
         tfp->dump(contextp->time());
