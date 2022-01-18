@@ -35,7 +35,8 @@ doc:
 clean:
 	#cd ${THISDIR}/chisel && \\
 	#make clean && \\
-	find ${THISDIR}/Simulations -name \*tmp\*.txt -exec rm {} \\; 
+	find ${THISDIR}/simulations -name \*tmp\*.txt -exec rm "{}" \\; 
+	rm -rf `find ${THISDIR}/simulations/ -type d -name \*_tmp\* | xargs` 
    
 EOF
 exit 0
