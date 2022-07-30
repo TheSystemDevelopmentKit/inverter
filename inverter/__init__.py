@@ -271,27 +271,25 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    #models=['spectre']
-    models=['py','sv','vhdl','eldo','spectre']
-    #models=['sv']
+    #models=['py','sv','vhdl','eldo','spectre']
+    models=['ngspice']
     duts=[]
     for model in models:
         d=inverter()
         duts.append(d) 
         d.model=model
         d.Rs=rs
-        d.spice_submission=""
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
         #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
-        #d.preserve_iofiles = True
-        #d.preserve_spicefiles = True
+        d.preserve_iofiles = True
+        d.preserve_spicefiles = True
         # Save the entity state after simulation
-        d.save_state = True
-        d.save_database = True
+        #d.save_state = True
+        #d.save_database = True
         # Optionally load the state of the most recent simulation
         #d.load_state = 'latest'
         d.IOS.Members['A'].Data=indata
@@ -343,6 +341,8 @@ if __name__=="__main__":
         plt.suptitle(titlestr,fontsize=20)
         plt.grid(True)
         plt.show(block=False)
-        #printstr="../inv_%s.eps" %(duts[k].model)
-        #figure.savefig(printstr, format='eps', dpi=300)
+        printstr="../inv_%s.eps" %(duts[k].model)
+        figure.savefig(printstr, format='eps', dpi=300)
+    # This is here to keep the images visible
+    # For batch execution, you should comment the following line 
     input()
