@@ -32,6 +32,7 @@ int main(int argc, char** argv, char** env) {
         contextp->timeInc(1);
 	}
     top->final();
+    tfp->close();
     delete top;
     delete contextp;
     exit(0);

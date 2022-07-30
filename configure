@@ -19,6 +19,14 @@ cat << EOF > ${THISDIR}/Makefile
 #all: chisel sim
 all: sim
 
+verilator:
+	rm -rf ${THISDIR}/sv/obj_dir/foobadir
+	rm -f ${THISDIR}/sv/obj_dir/*
+	mkdir ${THISDIR}/sv/obj_dir/foobadir
+	cd ${THISDIR}/sv && verilator -Wall --cc --exe --build --trace ./sim_main.cpp ./inverter.sv
+	cd ${THISDIR}/sv/obj_dir/ && ./Vinverter && cd ../..
+
+
 #sim: chisel
 sim:
 	cd ${THISDIR}/${MODULE} && \\
