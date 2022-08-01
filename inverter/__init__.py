@@ -83,10 +83,18 @@ class inverter(rtl,spice,thesdk):
         self.proplist = ['Rs'] # Properties that can be propagated from parent
         self.Rs = 100e6 # Sampling frequency
         self.vdd = 1.0
-        self.IOS=Bundle()
         self.IOS.Members['A'] = IO() # Pointer for input data
         self.IOS.Members['Z'] = IO()
         self.IOS.Members['CLK'] = IO() # Test clock for spice simulations
+        self.IOS.Members['A_OUT'] = IO() # Test output for the input A
+        ##Analog output for inverter for analog simulation
+        self.IOS.Members['Z_ANA'] = IO()
+        ## For Extracting rising edges from the output waveform
+        self.IOS.Members['Z_RISE'] = IO()
+        ## Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
+        ## The clock signal can be any node voltage in the simulation
+        self.IOS.Members['A_DIG'] = IO()
+
         self.IOS.Members['control_write'] = IO() # File for control is created in controller
         self.model = 'py' # Can be set externally, but is not propagated
 
@@ -171,8 +179,7 @@ class inverter(rtl,spice,thesdk):
                 _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames='A', rs=self.Rs, \
                                vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
 
-                ##Analog output for inverter
-                self.IOS.Members['Z_ANA'] = IO()
+                # These are helper IOS for analog simulation
                 _=spice_iofile(self, name='Z_ANA', dir='out', iotype='event', sourcetype='V', ionames='Z')
                 
                 # Sample type output
@@ -182,18 +189,15 @@ class inverter(rtl,spice,thesdk):
                 
 
                 # Saving the analog waveform of the input as well
-                self.IOS.Members['A_OUT'] = IO()
                 _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames='A')
 
-                ## Extracting rising edges from the output waveform
-                self.IOS.Members['Z_RISE'] = IO()
+                # For Extracting rising edges from the output waveform
                 _=spice_iofile(self, name='Z_RISE', dir='out', iotype='time', sourcetype='V', ionames='Z', \
                                edgetype='rising',vth=self.vdd/2)
 
 
                 ## Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
                 ## The clock signal can be any node voltage in the simulation
-                self.IOS.Members['A_DIG'] = IO()
                 _=spice_iofile(self, name='A_DIG', dir='out', iotype='sample', ionames='A', trigger='CLK', \
                                vth=self.vdd/2,edgetype='rising',ioformat='dec')
 
@@ -255,26 +259,30 @@ class inverter(rtl,spice,thesdk):
         # and after 'initdone' is set to 1 by controller
         self.iofile_bundle.Members['Z'].verilog_io_condition_append(cond='&& initdone')
 
-
 if __name__=="__main__":
     import matplotlib.pyplot as plt
     from inverter import *
     from inverter.controller import controller as inverter_controller
+    from inverter.signal_source import signal_source
+    from inverter.signal_plotter import signal_plotter
     import pdb
     length=2**8
     rs=100e6
-    indata=np.random.randint(2,size=length).reshape(-1,1)
-    clk=np.array([0 if i%2==0 else 1 for i in range(2*len(indata))]).reshape(-1,1)
     controller=inverter_controller()
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
 
-    #models=['py','sv','vhdl','eldo','spectre']
-    models=['ngspice']
+    models=['py','sv','vhdl','eldo','spectre']
+    #models=['ngspice']
+    # Here we instantiate the signal source
     duts=[]
+    plotters=[]
+    #Here we construct the 'testbench'
+    s_source=signal_source()
     for model in models:
+        # Create an inverter
         d=inverter()
         duts.append(d) 
         d.model=model
@@ -292,57 +300,34 @@ if __name__=="__main__":
         #d.save_database = True
         # Optionally load the state of the most recent simulation
         #d.load_state = 'latest'
-        d.IOS.Members['A'].Data=indata
-        d.IOS.Members['CLK'].Data=clk
+        # This connects the input to the output of the signal source
+        d.IOS.Members['A']=s_source.IOS.Members['data']
+        # This connects the clock to the output of the signal source
+        d.IOS.Members['CLK']=s_source.IOS.Members['clk']
         d.IOS.Members['control_write']=controller.IOS.Members['control_write']
+        ## Add plotters
+        p=signal_plotter()
+        plotters.append(p) 
+        p.plotmodel=d.model
+        p.plotvdd=d.vdd
+        p.Rs = rs
+        p.IOS.Members['A']=d.IOS.Members['A']
+        p.IOS.Members['Z']=d.IOS.Members['Z']
+        p.IOS.Members['A_OUT']=d.IOS.Members['A_OUT']
+        p.IOS.Members['A_DIG']=d.IOS.Members['A_DIG']
+        p.IOS.Members['Z_ANA']=d.IOS.Members['Z_ANA']
+        p.IOS.Members['Z_RISE']=d.IOS.Members['Z_RISE']
+        
+
+    # Here we run the instances
+    s_source.run() # Creates the data to the output
+    for d in duts:
         d.init()
         d.run()
+    for p in plotters:
+        p.init()
+        p.run()
 
-    for k in range(len(duts)):
-        hfont = {'fontname':'Sans'}
-        nsamp = 20
-        x = np.arange(nsamp).reshape(-1,1)
-        if duts[k].model == 'eldo' or duts[k].model=='spectre' or duts[k].model=='ngspice':
-            figure,axes = plt.subplots(2,2,sharex='col',tight_layout=True)
-            axes[0,0].stem(x,duts[k].IOS.Members['A_DIG'].Data[:nsamp,0])
-            axes[0,0].set_ylabel('Input', **hfont,fontsize=18)
-            axes[0,0].grid(True)
-            axes[1,0].stem(x,duts[k].IOS.Members['Z'].Data[:nsamp,0])
-            axes[1,0].set_xlim(0,nsamp-1)
-            axes[1,0].set_ylabel('Output', **hfont,fontsize=18)
-            axes[1,0].set_xlabel('Sample', **hfont,fontsize=18)
-            axes[1,0].grid(True)
-            axes[0,1].plot(duts[k].IOS.Members['A_OUT'].Data[:,0],duts[k].IOS.Members['A_OUT'].Data[:,1],label='Input')
-            axes[0,1].grid(True)
-            axes[1,1].plot(duts[k].IOS.Members['Z_ANA'].Data[:,0],duts[k].IOS.Members['Z_ANA'].Data[:,1],label='Output')
-            axes[1,1].plot(duts[k].IOS.Members['Z_RISE'].Data[:,0],np.ones(duts[k].IOS.Members['Z_RISE'].Data[:,0].shape)*duts[k].vdd/2,\
-                           ls='None',marker='o',label='Rising edges')
-            axes[1,1].set_xlabel('Time (s)', **hfont,fontsize=18)
-            axes[1,1].set_xlim(0,(nsamp-1)/rs)
-            axes[1,1].grid(True)
-        else:
-            if duts[k].model == 'sv' or duts[k].model == 'vhdl':
-                latency=1
-            else:
-                latency=0
-            figure,axes=plt.subplots(2,1,sharex=True)
-            axes[0].stem(x,duts[k].IOS.Members['A'].Data[:nsamp,0])
-            axes[0].set_ylim(0, 1.1)
-            axes[0].set_xlim((np.amin(x), np.amax(x)))
-            axes[0].set_ylabel('Input', **hfont,fontsize=18)
-            axes[0].grid(True)
-            axes[1].stem(x,duts[k].IOS.Members['Z'].Data[latency:nsamp+latency,0])
-            axes[1].set_ylim(0, 1.1)
-            axes[1].set_xlim((np.amin(x), np.amax(x)))
-            axes[1].set_ylabel('Output', **hfont,fontsize=18)
-            axes[1].set_xlabel('Sample (n)', **hfont,fontsize=18)
-            axes[1].grid(True)
-        titlestr = "Inverter model %s" %(duts[k].model) 
-        plt.suptitle(titlestr,fontsize=20)
-        plt.grid(True)
-        plt.show(block=False)
-        printstr="../inv_%s.eps" %(duts[k].model)
-        figure.savefig(printstr, format='eps', dpi=300)
-    # This is here to keep the images visible
-    # For batch execution, you should comment the following line 
+     #This is here to keep the images visible
+     #For batch execution, you should comment the following line 
     input()
