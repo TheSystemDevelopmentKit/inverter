@@ -80,7 +80,7 @@ class inverter(rtl,spice,thesdk):
 
         """
         self.print_log(type='I', msg='Initializing %s' %(__name__)) 
-        self.proplist = ['Rs'] # Properties that can be propagated from parent
+        self.proplist = ['Rs', 'vdd'] # Properties that can be propagated from parent
         self.Rs = 100e6 # Sampling frequency
         self.vdd = 1.0
         self.IOS.Members['A'] = IO() # Pointer for input data
