@@ -115,7 +115,7 @@ class signal_plotter(thesdk):
             axes[1,1].set_xlim(0,(nsamp-1)/self.Rs)
             axes[1,1].grid(True)
         else:
-            if self.model == 'sv' or self.model == 'vhdl':
+            if self.plotmodel == 'sv' or self.plotmodel == 'vhdl':
                 latency=1
             else:
                 latency=0
@@ -131,7 +131,7 @@ class signal_plotter(thesdk):
             axes[1].set_ylabel('Output', **hfont,fontsize=18)
             axes[1].set_xlabel('Sample (n)', **hfont,fontsize=18)
             axes[1].grid(True)
-        titlestr = "Inverter model %s" %(self.model) 
+        titlestr = "Inverter model %s" %(self.plotmodel) 
         plt.suptitle(titlestr,fontsize=20)
         plt.grid(True)
         plt.show(block=False)
