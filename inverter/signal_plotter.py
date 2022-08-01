@@ -49,16 +49,17 @@ class signal_plotter(thesdk):
                 Members of this bundle are the IO's of the entity. See documentation of thesdk package.
                 Default members defined as
 
-                self.IOS.Members['data']=IO() # Pointer for data to be plotted
-            
-        model : string
-            Default 'py' for Python. See documentation of thsdk package for more details.
+                self.IOS.Members['A'] = IO() 
+                self.IOS.Members['A_OUT'] = IO() 
+                self.IOS.Members['A_DIG'] = IO() 
+                self.IOS.Members['Z_ANA'] = IO() 
+                self.IOS.Members['Z_RISE'] = IO() 
             
         plotmodel : string
             Default 'py' for Python. 
 
-        length : int
-            The length of the data. Default 2**8
+        plotvdd : float
+            Supply voltage of analog signals. Defines the range for plots
 
 
         """
@@ -71,7 +72,7 @@ class signal_plotter(thesdk):
         self.IOS.Members['A_DIG'] = IO() 
         self.IOS.Members['Z_ANA'] = IO() 
         self.IOS.Members['Z_RISE'] = IO() 
-        self.model = 'py' # Can be set externally, but is not propagated
+        self.model = 'py'
         self.plotmodel = 'py'
         self.plotvdd = 1.0
 
