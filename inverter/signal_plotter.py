@@ -90,7 +90,7 @@ class signal_plotter(thesdk):
         pass #Currently nothing to add
 
     def main(self):
-        ''' Creates the signals and assigns them to output 
+        ''' Creates the plots 
         '''
         hfont = {'fontname':'Sans'}
         nsamp = 20
