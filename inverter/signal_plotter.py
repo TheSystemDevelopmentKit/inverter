@@ -25,6 +25,8 @@ if not (os.path.abspath('../../thesdk') in sys.path):
 from thesdk import *
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pdb
 
 class signal_plotter(thesdk):
     def _classfile(self):
@@ -62,7 +64,7 @@ class signal_plotter(thesdk):
         """
         #self.print_log(type='I', msg='Initializing %s' %(__name__)) 
         self.proplist = ['Rs'] # Properties that can be propagated from parent
-        self.length=2**8 # Length of the data.
+        self.Rs = 100e6
 
         self.IOS.Members['A'] = IO() 
         self.IOS.Members['A_OUT'] = IO() 
@@ -74,10 +76,10 @@ class signal_plotter(thesdk):
         self.plotvdd = 1.0
 
         # this copies the parameter values from the parent based on self.proplist
-        #if len(arg)>=1:
-        #    parent=arg[0]
-        #    self.copy_propval(parent,self.proplist)
-        #    self.parent=parent
+        if len(arg)>=1:
+            parent=arg[0]
+            self.copy_propval(parent,self.proplist)
+            self.parent=parent
 
         #self.init()
 
@@ -92,7 +94,8 @@ class signal_plotter(thesdk):
         '''
         hfont = {'fontname':'Sans'}
         nsamp = 20
-        if self.plotmodel == 'eldo' or sel.plotmodel=='spectre' or self.plotmodel=='ngspice':
+        x = np.arange(nsamp).reshape(-1,1)
+        if self.plotmodel == 'eldo' or self.plotmodel=='spectre' or self.plotmodel=='ngspice':
             figure,axes = plt.subplots(2,2,sharex='col',tight_layout=True)
             axes[0,0].stem(x,self.IOS.Members['A_DIG'].Data[:nsamp,0])
             axes[0,0].set_ylabel('Input', **hfont,fontsize=18)
@@ -108,7 +111,7 @@ class signal_plotter(thesdk):
             axes[1,1].plot(self.IOS.Members['Z_RISE'].Data[:,0],np.ones(self.IOS.Members['Z_RISE'].Data[:,0].shape)*self.plotvdd/2,\
                            ls='None',marker='o',label='Rising edges')
             axes[1,1].set_xlabel('Time (s)', **hfont,fontsize=18)
-            axes[1,1].set_xlim(0,(nsamp-1)/rs)
+            axes[1,1].set_xlim(0,(nsamp-1)/self.Rs)
             axes[1,1].grid(True)
         else:
             if self.model == 'sv' or self.model == 'vhdl':
