@@ -285,8 +285,8 @@ if __name__=="__main__":
         #d.interactive_spice=True
         #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
-        d.preserve_iofiles = True
-        d.preserve_spicefiles = True
+        # d.preserve_iofiles = True
+        # d.preserve_spicefiles = True
         # Save the entity state after simulation
         #d.save_state = True
         #d.save_database = True
