@@ -56,7 +56,11 @@ class signal_plotter(thesdk):
                 self.IOS.Members['Z_RISE'] = IO() 
             
         plotmodel : string
-            Default 'py' for Python. 
+            Default 'py' for Python.
+
+        plotprefix : string
+            Default  ''
+            Plotfiles are named as inv_<plotprefix><plotmodel>.eps
 
         plotvdd : float
             Supply voltage of analog signals. Defines the range for plots
@@ -74,6 +78,7 @@ class signal_plotter(thesdk):
         self.IOS.Members['Z_RISE'] = IO() 
         self.model = 'py'
         self.plotmodel = 'py'
+        self.plotprefix = ''
         self.plotvdd = 1.0
 
         # this copies the parameter values from the parent based on self.proplist
@@ -135,7 +140,7 @@ class signal_plotter(thesdk):
         plt.suptitle(titlestr,fontsize=20)
         plt.grid(True)
         plt.show(block=False)
-        printstr="../inv_%s.eps" %(self.model)
+        printstr="../inv_%s%s.eps" %(self.plotprefix,self.plotmodel)
         figure.savefig(printstr, format='eps', dpi=300)
 
     def run(self,*arg):
