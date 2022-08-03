@@ -260,12 +260,14 @@ class inverter(rtl,spice,thesdk):
         self.iofile_bundle.Members['Z'].verilog_io_condition_append(cond='&& initdone')
 
 if __name__=="__main__":
+    import argparse
     import matplotlib.pyplot as plt
     from inverter import *
     from inverter.controller import controller as inverter_controller
     from inverter.signal_source import signal_source
     from inverter.signal_plotter import signal_plotter
     import pdb
+
     length=2**8
     rs=100e6
     controller=inverter_controller()
@@ -274,8 +276,9 @@ if __name__=="__main__":
     #controller.step_time()
     controller.start_datafeed()
 
-    models=['py','sv','vhdl','eldo','spectre']
-    #models=['ngspice']
+    #By default, we set only open souce simulators
+    models=['py', 'ngspice']
+    #models=['py','sv','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
