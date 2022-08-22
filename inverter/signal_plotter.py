@@ -120,7 +120,7 @@ class signal_plotter(thesdk):
             axes[1,1].set_xlim(0,(nsamp-1)/self.Rs)
             axes[1,1].grid(True)
         else:
-            if self.plotmodel == 'sv' or self.plotmodel == 'vhdl':
+            if self.plotmodel in ['sv', 'vhdl', 'icarus']:
                 latency=1
             else:
                 latency=0
