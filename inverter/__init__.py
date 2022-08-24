@@ -44,9 +44,6 @@ from spice import *
 import numpy as np
 
 class inverter(rtl,spice,thesdk):
-    @property
-    def _classfile(self):
-        return os.path.dirname(os.path.realpath(__file__)) + "/"+__name__
 
     def __init__(self,*arg): 
         """ Inverter parameters and attributes
