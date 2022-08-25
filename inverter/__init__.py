@@ -154,6 +154,17 @@ class inverter(rtl,spice,thesdk):
                 run -all
                 wave zoom full
             """
+            if self.model == 'icarus':
+                interactive_control_contents="""
+                    set io_facs [list] 
+                    lappend io_facs "tb_inverter.inverter.A"
+                    lappend io_facs "tb_inverter.inverter.Z" 
+                    set num_added [ gtkwave::addSignalsFromList $io_facs ]
+                    puts "num signals added: $num_added"
+
+                    # zoom full
+                    gtkwave::/Time/Zoom/Zoom_Full
+                """
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
@@ -296,7 +307,7 @@ if __name__=="__main__":
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        #d.interactive_rtl=True
+        d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         d.preserve_iofiles = True
         # d.preserve_spicefiles = True
