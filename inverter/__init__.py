@@ -167,7 +167,9 @@ class inverter(rtl,spice,thesdk):
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
-                _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                # This is to avoid sampling time confusion with Icarus
+                f.verilog_io_sync='@(negedge clock)'
                 self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
@@ -287,8 +289,8 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'ngspice']
-    #models=['icarus']
+    #models=['py', 'ngspice']
+    models=['icarus']
     #models=['py','sv','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
@@ -301,12 +303,12 @@ if __name__=="__main__":
         duts.append(d) 
         d.model=model
         d.Rs=rs
-        #d.preserve_rtlfiles = True
+        d.preserve_rtlfiles = True
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        #d.interactive_rtl=True
+        d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         #d.preserve_iofiles = True
         # d.preserve_spicefiles = True
