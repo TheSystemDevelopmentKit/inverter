@@ -287,8 +287,8 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    #models=['py', 'ngspice']
-    models=['icarus']
+    models=['py', 'ngspice']
+    #models=['icarus']
     #models=['py','sv','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
@@ -301,14 +301,14 @@ if __name__=="__main__":
         duts.append(d) 
         d.model=model
         d.Rs=rs
-        d.preserve_rtlfiles = True
+        #d.preserve_rtlfiles = True
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        d.interactive_rtl=True
+        #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
-        d.preserve_iofiles = True
+        #d.preserve_iofiles = True
         # d.preserve_spicefiles = True
         # Save the entity state after simulation
         #d.save_state = True
