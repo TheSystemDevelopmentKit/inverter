@@ -145,25 +145,24 @@ class inverter(rtl,spice,thesdk):
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
-            interactive_control_contents="""
-                add wave -position insertpoint \\
-                sim/:tb_inverter:A \\
-                sim/:tb_inverter:initdone \\
-                sim/:tb_inverter:clock \\
-                sim/:tb_inverter:Z
-                run -all
-                wave zoom full
-            """
             if self.model == 'icarus':
                 interactive_control_contents="""
                     set io_facs [list] 
                     lappend io_facs "tb_inverter.inverter.A"
                     lappend io_facs "tb_inverter.inverter.Z" 
-                    set num_added [ gtkwave::addSignalsFromList $io_facs ]
-                    puts "num signals added: $num_added"
-
-                    # zoom full
+                    lappend io_facs "tb_inverter.clock"
+                    gtkwave::addSignalsFromList $io_facs 
                     gtkwave::/Time/Zoom/Zoom_Full
+                """
+            else:
+                interactive_control_contents="""
+                    add wave -position insertpoint \\
+                    sim/:tb_inverter:A \\
+                    sim/:tb_inverter:initdone \\
+                    sim/:tb_inverter:clock \\
+                    sim/:tb_inverter:Z
+                    run -all
+                    wave zoom full
                 """
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
