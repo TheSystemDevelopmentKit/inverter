@@ -142,19 +142,31 @@ class inverter(rtl,spice,thesdk):
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
-            interactive_control_contents="""
-                add wave -position insertpoint \\
-                sim/:tb_inverter:A \\
-                sim/:tb_inverter:initdone \\
-                sim/:tb_inverter:clock \\
-                sim/:tb_inverter:Z
-                run -all
-                wave zoom full
-            """
-            if self.model=='sv':
+            if self.model == 'icarus':
+                interactive_control_contents="""
+                    set io_facs [list] 
+                    lappend io_facs "tb_inverter.inverter.A"
+                    lappend io_facs "tb_inverter.inverter.Z" 
+                    lappend io_facs "tb_inverter.clock"
+                    gtkwave::addSignalsFromList $io_facs 
+                    gtkwave::/Time/Zoom/Zoom_Full
+                """
+            else:
+                interactive_control_contents="""
+                    add wave -position insertpoint \\
+                    sim/:tb_inverter:A \\
+                    sim/:tb_inverter:initdone \\
+                    sim/:tb_inverter:clock \\
+                    sim/:tb_inverter:Z
+                    run -all
+                    wave zoom full
+                """
+            if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
-                _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                # This is to avoid sampling time confusion with Icarus
+                f.verilog_io_sync='@(negedge clock)'
                 self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
@@ -274,8 +286,8 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'ngspice']
-    #models=['py','sv','vhdl','eldo','spectre']
+    models=['py', 'icarus', 'ngspice']
+    #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
@@ -287,13 +299,14 @@ if __name__=="__main__":
         duts.append(d) 
         d.model=model
         d.Rs=rs
+        #d.preserve_rtlfiles = True
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
         #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
-        # d.preserve_iofiles = True
+        #d.preserve_iofiles = True
         # d.preserve_spicefiles = True
         # Save the entity state after simulation
         #d.save_state = True
