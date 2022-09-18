@@ -277,6 +277,12 @@ if __name__=="__main__":
     from inverter.signal_plotter import signal_plotter
     import pdb
 
+    # Implement argument parser
+    parser = argparse.ArgumentParser(description='Parse selectors')
+    parser.add_argument('--show', dest='show', type=bool, nargs='?', const = True, 
+            default=False,help='Show figures on screen')
+    args=parser.parse_args()
+
     length=2**8
     rs=100e6
     controller=inverter_controller()
@@ -343,4 +349,8 @@ if __name__=="__main__":
 
      #This is here to keep the images visible
      #For batch execution, you should comment the following line 
-    input()
+    if args.show:
+       input()
+    #This is to have exit status for succesfuulexecution
+    sys.exit(0)
+
