@@ -70,7 +70,7 @@ PID="$$"
 if [ "$CICD" == "1" ]; then
     git config --global --add safe.directory /__w/inverter/inverter
 fi
-ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
+ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(\.git\)#\2#p')"
 HASH="$(git rev-parse --verify HEAD)"
 echo "ENTITY is $ENTITY" 
 echo "HASH is $HASH"
