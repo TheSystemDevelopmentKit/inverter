@@ -61,12 +61,6 @@ if [ -z "$TOKEN" ]; then
     echo "Token must be provided for CI/CD"
     exit 1
 fi
-echo $CICD
-exit 0
-echo $CICD
-exit 0
-echo $CICD
-exit 0
 
 # Assumption is that we are working in the clone of the submodule project.
 WORKDIR=$(pwd)
@@ -85,8 +79,8 @@ git checkout "$BRANCH"
 git pull
 
 # Local pip-installations to follow the dependencies of the main program
-mkdir ${HOME}/.local
-mkdir ${HOME}/.local/bin
+#mkdir ${HOME}/.local
+#mkdir ${HOME}/.local/bin
 PATH="${PATH}:${HOME}./local:${HOME}/.local/bin"
 
 # Normal workflow
@@ -95,7 +89,7 @@ sed -i 's#\(url = \)\(git@\)\(.*\)\(:\)\(.*$\)#\1https://\3/\5#g' .gitmodules \
     && git submodule sync \
     && git submodule update --init
 
-./pip3userinstall.sh
+#./pip3userinstall.sh
 
 cd ./Entities/${ENTITY}
 git checkout ${HASH}
