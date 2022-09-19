@@ -79,6 +79,7 @@ git checkout "$BRANCH"
 git pull
 
 # Local pip-installations to follow the dependencies of the main program
+# Included to the thesdktestimage
 #mkdir ${HOME}/.local
 #mkdir ${HOME}/.local/bin
 PATH="${PATH}:${HOME}./local:${HOME}/.local/bin"
