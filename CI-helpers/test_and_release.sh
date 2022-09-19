@@ -72,7 +72,7 @@ if [ "$CICD" == "1" ]; then
 fi
 git remote get-url origin
 
-ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
+ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\([.]git\)#\2#p')"
 HASH="$(git rev-parse --verify HEAD)"
 echo "ENTITY is $ENTITY" 
 echo "HASH is $HASH"
