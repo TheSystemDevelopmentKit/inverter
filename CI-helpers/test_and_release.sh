@@ -67,10 +67,13 @@ WORKDIR=$(pwd)
 PID="$$"
 
 #Automation fails in CI/CD. Do not know why. Do not know why
-#ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
-ENTITY="inverter"
+if [ "$CICD" == "1" ]; then
+    git config --global --add safe.directory /__w/inverter/inverter
+fi
+ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
 HASH="$(git rev-parse --verify HEAD)"
-echo "Hash is $HASH"
+echo "ENTITY is $ENTITY" 
+echo "HASH is $HASH"
 MESSAGE="$(git log -1 --pretty=%B | head -n 1)"
 
 git clone https://github.com/TheSystemDevelopmentKit/thesdk_template.git ./thesdk_template_${PID}
