@@ -65,10 +65,12 @@ fi
 # Assumption is that we are working in the clone of the submodule project.
 WORKDIR=$(pwd)
 PID="$$"
-git remote get-url origin
 
-ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
+#Automation fails in CI/CD. Do not know why. Do not know why
+#ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
+ENTITY="inverter"
 HASH="$(git rev-parse --verify HEAD)"
+echo "Hash is $HASH"
 MESSAGE="$(git log -1 --pretty=%B | head -n 1)"
 
 git clone https://github.com/TheSystemDevelopmentKit/thesdk_template.git ./thesdk_template_${PID}
