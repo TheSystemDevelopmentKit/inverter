@@ -120,22 +120,22 @@ else
     echo "Tests OK, proceeding"
 fi
 
-if [ "$STATUS" == "0" ]; then
-    cd $TEMPLATEDIR
-    echo "Staging ./Entities/${ENTITY}"
-    git add ./Entities/${ENTITY}
-
-    echo "Committing ./Entities/${ENTITY}"
-    COMMITMESSAGE="$(echo -e "Update Entity ${ENTITY}:\n\n"$MESSAGE"\n\n")"
-    echo "$COMMITMESSAGE"
-    if [ ${CICD} == "1" ]; then 
-        git config --global user.name "ecdbot"
-        git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
-    fi
-    git commit -m"$COMMITMESSAGE"
-    git remote set-url origin "https://x-access-token:${TOKEN}@github.com/TheSystemDevelopmentKit/thesdk_template.git"
-    git push 
-fi
+#if [ "$STATUS" == "0" ]; then
+#    cd $TEMPLATEDIR
+#    echo "Staging ./Entities/${ENTITY}"
+#    git add ./Entities/${ENTITY}
+#
+#    echo "Committing ./Entities/${ENTITY}"
+#    COMMITMESSAGE="$(echo -e "Update Entity ${ENTITY}:\n\n"$MESSAGE"\n\n")"
+#    echo "$COMMITMESSAGE"
+#    if [ ${CICD} == "1" ]; then 
+#        git config --global user.name "ecdbot"
+#        git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
+#    fi
+#    git commit -m"$COMMITMESSAGE"
+#    git remote set-url origin "https://x-access-token:${TOKEN}@github.com/TheSystemDevelopmentKit/thesdk_template.git"
+#    git push 
+#fi
 cd ${WORKDIR} && rm -rf ./thesdk_template_${PID} 
 exit $STATUS
 
