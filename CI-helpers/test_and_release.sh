@@ -61,6 +61,12 @@ if [ -z "$TOKEN" ]; then
     echo "Token must be provided for CI/CD"
     exit 1
 fi
+echo $CICD
+exit 0
+echo $CICD
+exit 0
+echo $CICD
+exit 0
 
 # Assumption is that we are working in the clone of the submodule project.
 WORKDIR=$(pwd)
@@ -118,11 +124,11 @@ if [ "$STATUS" == "0" ]; then
     echo "Committing ./Entities/${ENTITY}"
     COMMITMESSAGE="$(echo -e "Update Entity ${ENTITY}:\n\n"$MESSAGE"\n\n")"
     echo "$COMMITMESSAGE"
-    git commit -m"$COMMITMESSAGE"
     if [ ${CICD} == "1" ]; then 
         git config --global user.name "ecdbot"
         git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
     fi
+    git commit -m"$COMMITMESSAGE"
     git remote set-url origin "https://x-access-token:${TOKEN}@github.com/TheSystemDevelopmentKit/thesdk_template.git"
     git push 
 fi
