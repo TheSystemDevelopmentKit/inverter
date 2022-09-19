@@ -65,6 +65,8 @@ fi
 # Assumption is that we are working in the clone of the submodule project.
 WORKDIR=$(pwd)
 PID="$$"
+git remote get-url origin
+
 ENTITY="$(git remote get-url origin | sed -n 's#\(.*/\)\(.*\)\(.git\)#\2#p')"
 HASH="$(git rev-parse --verify HEAD)"
 MESSAGE="$(git log -1 --pretty=%B | head -n 1)"
