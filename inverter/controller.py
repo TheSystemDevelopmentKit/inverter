@@ -46,7 +46,7 @@ class controller(rtl):
         # controller
         # These are signals of tb driving several targets
         # Not present in DUT
-        self.connectors=verilog_connector_bundle()
+        self.connectors=rtl_connector_bundle()
 
         if len(arg)>=1:
             parent=arg[0]

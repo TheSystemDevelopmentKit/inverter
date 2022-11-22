@@ -174,7 +174,8 @@ class inverter(rtl,spice,thesdk):
             elif self.model=='vhdl':
                 # VHDL simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
-                _=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
+                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
+                f.verilog_io_sync='@(negedge clock)'
                 self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
@@ -292,7 +293,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ngspice']
+    models=['py', 'icarus', 'ngspice' ]
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
