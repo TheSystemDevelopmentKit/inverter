@@ -293,8 +293,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'icarus']
-    #models=['py','sv','vhdl']
+    models=['py', 'icarus', 'ngspice' ]
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
