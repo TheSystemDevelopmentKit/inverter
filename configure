@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Test changes
 THISDIR=$( cd `dirname $0` && pwd )
 MODULE=$( basename ${THISDIR})
 
