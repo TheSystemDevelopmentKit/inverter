@@ -25,7 +25,7 @@ Role of section 'if __name__=="__main__"'
 
 This section is for self testing and interfacing of this class. The content of
 it is fully up to designer. You may use it for example to test the
-functionality of the class by calling it as ``pyhon3.6 __init__.py`` or you may
+functionality of the class by calling it as ``pyhon3 __init__.py`` or you may
 define how it handles the arguments passed during the invocation. In this
 example it is used as a complete self test script for all the simulation models
 defined for the inverter. 
