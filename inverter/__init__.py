@@ -293,7 +293,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ngspice' ]
+    models=['vhdl']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
@@ -305,8 +305,10 @@ if __name__=="__main__":
         d=inverter()
         duts.append(d) 
         d.model=model
+        d.runname='fooba'
+        d.lang='vhdl'
         d.Rs=rs
-        #d.preserve_rtlfiles = True
+        d.preserve_rtlfiles = True
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
