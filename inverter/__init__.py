@@ -286,7 +286,7 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
-    lang='vhdl'
+    lang='sv'
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
