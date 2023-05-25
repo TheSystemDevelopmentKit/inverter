@@ -286,7 +286,8 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
-    controller=inverter_controller()
+    lang='vhdl'
+    controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
@@ -306,7 +307,7 @@ if __name__=="__main__":
         duts.append(d) 
         d.model=model
         d.runname='fooba'
-        d.lang='vhdl'
+        d.lang=lang
         d.Rs=rs
         d.preserve_rtlfiles = True
         # Enable debug messages

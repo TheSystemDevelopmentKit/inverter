@@ -12,7 +12,8 @@ class controller(rtl):
     def _classfile(self):
         return os.path.dirname(os.path.realpath(__file__)) + "/"+__name__
 
-    def __init__(self,*arg): 
+    def __init__(self,*arg,**kwargs): 
+        self.lang=kwargs.get('lang','sv')
         self.proplist = [ 'Rs' ];    #properties that can be propagated from parent
         self.Rs = 100e6;                   # Sampling frequency
         self.step=int(1/(self.Rs*1e-12))   #Time increment for control
@@ -39,14 +40,18 @@ class controller(rtl):
 
         # We now where the rtl file is. 
         # Let's read in the file to have IOs defined
-        self.dut=verilog_module(file=self.vlogsrcpath 
-                + '/inverter.sv')
+        if self.lang == 'sv':
+            self.dut=verilog_module(file=self.vlogsrcpath 
+                    + '/inverter.sv')
+        elif self.lang == 'vhdl':
+            self.dut=vhdl_entity(file=self.vhdlsrcpath 
+                    + '/inverter.vhd')
 
         # Define the signal connectors associated with this 
         # controller
         # These are signals of tb driving several targets
         # Not present in DUT
-        self.connectors=rtl_connector_bundle()
+        self.connectors=rtl_connector_bundle(lang=self.lang)
 
         if len(arg)>=1:
             parent=arg[0]
@@ -99,7 +104,8 @@ class controller(rtl):
         for name, val in self.signallist_write:
             # We manipulate connectors as rtl_iofile operate on those
             if name in self.newsigs_write:
-                self.connectors.new(name=name, cls='reg')
+                #Type is needed for vhdl
+                self.connectors.new(name=name, cls='reg', type='std_logic')
             else:
                 self.connectors.Members[name]=self.dut.io_signals.Members[name]
                 self.connectors.Members[name].init=''
