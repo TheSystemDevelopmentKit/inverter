@@ -292,7 +292,6 @@ if __name__=="__main__":
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
-
     #By default, we set only open souce simulators
     models=['vhdl']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
