@@ -286,14 +286,15 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
-    lang='sv'
+    lang='vhdl'
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
     #By default, we set only open souce simulators
-    models=['vhdl']
+    models=['sv']
+    #models=['icarus']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
