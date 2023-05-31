@@ -86,6 +86,7 @@ class controller(rtl):
     def reset_control_sequence(self):
         f=self.iofile_bundle.Members['control_write']
         self.time=0
+        # IO is a file data stuctur
         f.Data= np.array([])
         f.set_control_data(init=0) # Initialize to zeros at time 0
         self.assign_io()
@@ -113,7 +114,7 @@ class controller(rtl):
 
         f=self.iofile_bundle.Members['control_write']
         #define connectors controlled by this file in order of the list provided 
-        f.verilog_connectors=self.connectors.list(names=scansigs_write)
+        f.rtl_connectors=self.connectors.list(names=scansigs_write)
         f.set_control_data(init=0) # Initialize to zeros at time 0
 
     #Methods to reset and to start datafeed
