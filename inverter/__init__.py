@@ -264,10 +264,10 @@ class inverter(rtl,spice,thesdk):
 
         '''
         # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['A'].verilog_io_condition='initdone'
+        self.iofile_bundle.Members['A'].rtl_io_condition='initdone'
         # Output is read to verilog simulation when all of the outputs are valid, 
         # and after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['Z'].verilog_io_condition_append(cond='&& initdone')
+        self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='&& initdone')
 
 if __name__=="__main__":
     import argparse
