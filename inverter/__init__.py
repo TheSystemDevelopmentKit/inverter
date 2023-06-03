@@ -167,7 +167,7 @@ class inverter(rtl,spice,thesdk):
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
                 # This is to avoid sampling time confusion with Icarus
                 f.verilog_io_sync='@(negedge clock)'
-                self.rtlparameters=dict([ ('g_Rs',('integer',self.Rs)),]) # Defines the sample rate
+                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
@@ -286,16 +286,16 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
-    #lang='vhdl'
-    lang='sv'
+    lang='vhdl'
+    #lang='sv'
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
     #By default, we set only open souce simulators
-    #models=['sv']
-    models=['icarus']
+    models=['vhdl']
+    #models=['icarus']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
