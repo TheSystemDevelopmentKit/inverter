@@ -176,7 +176,7 @@ class inverter(rtl,spice,thesdk):
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
                 f.verilog_io_sync='@(negedge clock)'
-                self.rtlparameters=dict([ ('g_Rs',('integer',self.Rs)),]) # Defines the sample rate
+                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
