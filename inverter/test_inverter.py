@@ -11,15 +11,13 @@ TIMEOUT = 100000
 @cocotb.test(timeout_time=2*TIMEOUT, timeout_unit="step")
 async def test_inverter(dut):
     """
-    This test loads the program from an elf file into ROM, toggles reset, and runs the clock
-    for a specified number of clock cycles
+    Inverter test
     """
     s_source = signal_source()
     s_source.run()
-    for sample in s_source:
-        dut.A.value = sample
+    for sample in s_source.IOS.Members['data'].Data:
+        dut.A.value = int(sample[0])
         await Timer(1)
-        print(dut.Z.value)
-    assert(1==1)
+        assert(dut.Z.value == abs(int(sample[0]) - 1))
 
 

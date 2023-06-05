@@ -1,6 +1,7 @@
 Makefile
 **/__pycache__
 doc/build/*
+**/sim_build/**
 *.eps
 *.pdf
 *~

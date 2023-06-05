@@ -139,9 +139,9 @@ class inverter(rtl,spice,thesdk):
                 and it is assigned to self.queue and self.par is set to True. 
         
         '''
-        if cocotb:
-            verilog_sources = [self.simdut] + \
-                            [os.path.join(self.rtlsimpath, file) for file in self.vlogmodulefiles]
+        if cocotb and self.model == 'icarus':
+            verilog_sources = [self.vlogsrc] + \
+                            [file for file in self.vlogmodulefiles]
             cocotb_test.simulator.run(
                 verilog_sources=verilog_sources,
                 work_dir=os.getcwd(),
@@ -305,7 +305,7 @@ if __name__=="__main__":
     controller.start_datafeed()
 
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ngspice' ]
+    models=['icarus']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
     duts=[]
@@ -355,10 +355,11 @@ if __name__=="__main__":
     s_source.run() # Creates the data to the output
     for d in duts:
         d.init()
-        d.run(**args)
-    for p in plotters:
-        p.init()
-        p.run()
+        d.run(cocotb=args.cocotb)
+    if not args.cocotb:
+        for p in plotters:
+            p.init()
+            p.run()
 
      #This is here to keep the images visible
      #For batch execution, you should comment the following line 
