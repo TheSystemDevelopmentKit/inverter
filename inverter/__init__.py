@@ -40,6 +40,7 @@ if not (os.path.abspath('../../thesdk') in sys.path):
 from thesdk import *
 from rtl import *
 from spice import *
+import cocotb_test.simulator
 
 import numpy as np
 
@@ -126,7 +127,7 @@ class inverter(rtl,spice,thesdk):
             self.queue.put(out)
         self.IOS.Members['Z'].Data=out
 
-    def run(self,*arg):
+    def run(self,*arg,cocotb=False):
         ''' The default name of the method to be executed. This means: parameters and attributes 
             control what is executed if run method is executed. By this we aim to avoid the need of 
             documenting what is the execution method. It is always self.run. 
@@ -138,7 +139,16 @@ class inverter(rtl,spice,thesdk):
                 and it is assigned to self.queue and self.par is set to True. 
         
         '''
-        if self.model=='py':
+        if cocotb:
+            verilog_sources = [self.simdut] + \
+                            [os.path.join(self.rtlsimpath, file) for file in self.vlogmodulefiles]
+            cocotb_test.simulator.run(
+                verilog_sources=verilog_sources,
+                work_dir=os.getcwd(),
+                toplevel="inverter",
+                module="test_inverter"
+            )
+        elif self.model=='py':
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
@@ -282,6 +292,8 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parse selectors')
     parser.add_argument('--show', dest='show', type=bool, nargs='?', const = True, 
             default=False,help='Show figures on screen')
+    parser.add_argument('--cocotb', dest='cocotb', type=bool, nargs='?', const = True, 
+            default=False,help='Use cocotb testbench')
     args=parser.parse_args()
 
     length=2**8
@@ -343,7 +355,7 @@ if __name__=="__main__":
     s_source.run() # Creates the data to the output
     for d in duts:
         d.init()
-        d.run()
+        d.run(**args)
     for p in plotters:
         p.init()
         p.run()
