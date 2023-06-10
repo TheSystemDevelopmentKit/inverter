@@ -153,7 +153,7 @@ class inverter(rtl,spice,thesdk):
                 """
             else:
                 interactive_control_contents="""
-                    add wave -position insertpoint \\
+                    add wave \\
                     sim/:tb_inverter:A \\
                     sim/:tb_inverter:initdone \\
                     sim/:tb_inverter:clock \\
@@ -166,7 +166,11 @@ class inverter(rtl,spice,thesdk):
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
                 # This is to avoid sampling time confusion with Icarus
-                f.verilog_io_sync='@(negedge clock)'
+                if self.lang == 'sv':
+                    f.rtl_io_sync='@(negedge clock)'
+                elif self.lang == 'vhdl':
+                    f.rtl_io_sync='falling_edge(clock)'
+
                 self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
@@ -175,7 +179,10 @@ class inverter(rtl,spice,thesdk):
                 # VHDL simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
-                f.verilog_io_sync='@(negedge clock)'
+                if self.lang == 'sv':
+                    f.rtl_io_sync='@(negedge clock)'
+                elif self.lang == 'vhdl':
+                    f.rtl_io_sync='falling_edge(clock)'
                 self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
@@ -263,11 +270,17 @@ class inverter(rtl,spice,thesdk):
         '''This overloads the method called by run_rtl method. It defines the read/write conditions for the files
 
         '''
-        # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['A'].rtl_io_condition='initdone'
-        # Output is read to verilog simulation when all of the outputs are valid, 
-        # and after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='&& initdone')
+        if self.lang == 'sv':
+            # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['A'].rtl_io_condition='initdone'
+            # Output is read to verilog simulation when all of the outputs are valid, 
+            # and after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='&& initdone')
+        elif self.lang == 'vhdl':
+            self.iofile_bundle.Members['A'].rtl_io_condition='(initdone = \'1\')'
+            # Output is read to verilog simulation when all of the outputs are valid, 
+            # and after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='and initdone = \'1\'')
 
 if __name__=="__main__":
     import argparse
@@ -286,15 +299,17 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
+    #Testbench vhdl
+    #lang='vhdl'
     lang='vhdl'
-    #lang='sv'
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
     #By default, we set only open souce simulators
-    models=['vhdl']
+    #dut is verilog 
+    models=['sv']
     #models=['icarus']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
@@ -307,7 +322,6 @@ if __name__=="__main__":
         d=inverter()
         duts.append(d) 
         d.model=model
-        d.runname='fooba'
         d.lang=lang
         d.Rs=rs
         d.preserve_rtlfiles = True
