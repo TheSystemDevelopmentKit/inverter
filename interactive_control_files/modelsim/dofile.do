@@ -1,4 +1,4 @@
-add wave -position insertpoint  \
+add wave \
 sim/:tb_inverter:A \
 sim/:tb_inverter:initdone \
 sim/:tb_inverter:clock \

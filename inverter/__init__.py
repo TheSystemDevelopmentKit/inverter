@@ -153,7 +153,7 @@ class inverter(rtl,spice,thesdk):
                 """
             else:
                 interactive_control_contents="""
-                    add wave -position insertpoint \\
+                    add wave \\
                     sim/:tb_inverter:A \\
                     sim/:tb_inverter:initdone \\
                     sim/:tb_inverter:clock \\
