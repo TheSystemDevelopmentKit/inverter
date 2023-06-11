@@ -142,7 +142,7 @@ class inverter(rtl,spice,thesdk):
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
-            if self.model == 'icarus':
+            if self.model == 'icarus' or self.model == 'ghdl':
                 interactive_control_contents="""
                     set io_facs [list] 
                     lappend io_facs "tb_inverter.inverter.A"
@@ -175,7 +175,7 @@ class inverter(rtl,spice,thesdk):
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
-            elif self.model=='vhdl':
+            elif self.model=='vhdl' or self.model == 'ghdl':
                 # VHDL simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
@@ -309,7 +309,8 @@ if __name__=="__main__":
     controller.start_datafeed()
     #By default, we set only open souce simulators
     #dut is verilog 
-    models=['sv']
+    models=['ghdl']
+    #models=['vhdl']
     #models=['icarus']
     #models=['py','sv' 'icarus','vhdl','eldo','spectre']
     # Here we instantiate the signal source
@@ -325,11 +326,12 @@ if __name__=="__main__":
         d.lang=lang
         d.Rs=rs
         d.preserve_rtlfiles = True
+        d.runname='foobs'   
         # Enable debug messages
         #d.DEBUG = True
         # Run simulations in interactive modes to monitor progress/results
         #d.interactive_spice=True
-        #d.interactive_rtl=True
+        d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         #d.preserve_iofiles = True
         # d.preserve_spicefiles = True
