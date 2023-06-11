@@ -16,7 +16,7 @@ class controller(rtl):
         self.lang=kwargs.get('lang','sv')
         self.proplist = [ 'Rs' ];    #properties that can be propagated from parent
         self.Rs = 100e6;                   # Sampling frequency
-        self.step=int(1/(self.Rs*1e-12))   #Time increment for control
+        self.step=int(1/(self.Rs*1e-12))   #Time increment for control in simulation units. Assumed to be ps
         self.time=0
         self.IOS=Bundle()
         self.IOS.Members['control_write']= IO()        #We use this for writing

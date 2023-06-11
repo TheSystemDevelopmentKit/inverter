@@ -187,6 +187,8 @@ class inverter(rtl,spice,thesdk):
                 self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
+                print(self.IOS.Members['Z'].Data)
+                print(self.IOS.Members['A'].Data)
             elif self.model in ['eldo','spectre','ngspice']:
 
                 # Creating a clock signal, which is used for testing the sample output features
@@ -305,7 +307,7 @@ if __name__=="__main__":
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
-    #controller.step_time()
+    controller.step_time(step=controller.step // 2 + 1) # Clock starts at zero, and initdone is delayed by slightly mnore that half clock cycle
     controller.start_datafeed()
     #By default, we set only open souce simulators
     #dut is verilog 
