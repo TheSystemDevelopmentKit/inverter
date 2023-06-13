@@ -142,17 +142,18 @@ class inverter(rtl,spice,thesdk):
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
+            # Interactive control files
             if self.model == 'icarus' or self.model == 'ghdl':
-                interactive_control_contents="""
+                self.interactive_control_contents="""
                     set io_facs [list] 
-                    lappend io_facs "tb_inverter.inverter.A"
-                    lappend io_facs "tb_inverter.inverter.Z" 
+                    lappend io_facs "tb_inverter.A"
+                    lappend io_facs "tb_inverter.Z" 
                     lappend io_facs "tb_inverter.clock"
                     gtkwave::addSignalsFromList $io_facs 
                     gtkwave::/Time/Zoom/Zoom_Full
                 """
             else:
-                interactive_control_contents="""
+                self.interactive_control_contents="""
                     add wave \\
                     sim/:tb_inverter:A \\
                     sim/:tb_inverter:initdone \\
@@ -161,6 +162,16 @@ class inverter(rtl,spice,thesdk):
                     run -all
                     wave zoom full
                 """
+
+            if self.model == 'ghdl':
+                # With this structure you can control the signals to be dumped to VCD 
+                #pass
+                self.simulator_control_contents=("version = 1.1  # Optional\n"
+                + "/tb_inverter/A\n"
+                + "/tb_inverter/Z\n"
+                + "/tb_inverter/clock\n"
+                                                 )
+
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
@@ -172,7 +183,6 @@ class inverter(rtl,spice,thesdk):
                     f.rtl_io_sync='falling_edge(clock)'
 
                 self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
-                self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
             elif self.model=='vhdl' or self.model == 'ghdl':
@@ -184,7 +194,6 @@ class inverter(rtl,spice,thesdk):
                 elif self.lang == 'vhdl':
                     f.rtl_io_sync='falling_edge(clock)'
                 self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
-                self.interactive_control_contents=interactive_control_contents
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
             elif self.model in ['eldo','spectre','ngspice']:
