@@ -318,7 +318,7 @@ if __name__=="__main__":
     controller.start_datafeed()
     #models=['py','sv','icarus', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ngspice']
+    models=['py', 'icarus', 'ghdl', 'ngspice']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
@@ -329,7 +329,10 @@ if __name__=="__main__":
         d=inverter()
         duts.append(d) 
         d.model=model
-        d.lang=lang
+        if model == 'ghdl':
+            d.lang='vhdl'
+        else:
+            d.lang=lang
         d.Rs=rs
         #d.preserve_rtlfiles = True
         # Enable debug messages
