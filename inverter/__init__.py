@@ -308,19 +308,16 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
+    lang='sv'
     #Testbench vhdl
     #lang='vhdl'
-    lang='vhdl'
     controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     controller.start_datafeed()
+    #models=['py','sv','icarus', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
     #By default, we set only open souce simulators
-    #dut is verilog 
-    models=['ghdl']
-    #models=['vhdl']
-    #models=['icarus']
-    #models=['py','sv' 'icarus','vhdl','eldo','spectre']
+    models=['py', 'icarus', 'ngspice']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
