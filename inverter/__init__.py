@@ -142,17 +142,18 @@ class inverter(rtl,spice,thesdk):
             self.main()
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
-            if self.model == 'icarus':
-                interactive_control_contents="""
+            # Interactive control files
+            if self.model == 'icarus' or self.model == 'ghdl':
+                self.interactive_control_contents="""
                     set io_facs [list] 
-                    lappend io_facs "tb_inverter.inverter.A"
-                    lappend io_facs "tb_inverter.inverter.Z" 
+                    lappend io_facs "tb_inverter.A"
+                    lappend io_facs "tb_inverter.Z" 
                     lappend io_facs "tb_inverter.clock"
                     gtkwave::addSignalsFromList $io_facs 
                     gtkwave::/Time/Zoom/Zoom_Full
                 """
             else:
-                interactive_control_contents="""
+                self.interactive_control_contents="""
                     add wave \\
                     sim/:tb_inverter:A \\
                     sim/:tb_inverter:initdone \\
@@ -161,23 +162,38 @@ class inverter(rtl,spice,thesdk):
                     run -all
                     wave zoom full
                 """
+
+            if self.model == 'ghdl':
+                # With this structure you can control the signals to be dumped to VCD 
+                #pass
+                self.simulator_control_contents=("version = 1.1  # Optional\n"
+                + "/tb_inverter/A\n"
+                + "/tb_inverter/Z\n"
+                + "/tb_inverter/clock\n"
+                                                 )
+
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
                 # This is to avoid sampling time confusion with Icarus
-                f.verilog_io_sync='@(negedge clock)'
-                self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
-                self.interactive_control_contents=interactive_control_contents
+                if self.lang == 'sv':
+                    f.rtl_io_sync='@(negedge clock)'
+                elif self.lang == 'vhdl':
+                    f.rtl_io_sync='falling_edge(clock)'
+
+                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
-            elif self.model=='vhdl':
+            elif self.model=='vhdl' or self.model == 'ghdl':
                 # VHDL simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
-                f.verilog_io_sync='@(negedge clock)'
-                self.rtlparameters=dict([ ('g_Rs',self.Rs),]) # Defines the sample rate
-                self.interactive_control_contents=interactive_control_contents
+                if self.lang == 'sv':
+                    f.rtl_io_sync='@(negedge clock)'
+                elif self.lang == 'vhdl':
+                    f.rtl_io_sync='falling_edge(clock)'
+                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
                 self.run_rtl()
                 self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
             elif self.model in ['eldo','spectre','ngspice']:
@@ -263,11 +279,17 @@ class inverter(rtl,spice,thesdk):
         '''This overloads the method called by run_rtl method. It defines the read/write conditions for the files
 
         '''
-        # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['A'].verilog_io_condition='initdone'
-        # Output is read to verilog simulation when all of the outputs are valid, 
-        # and after 'initdone' is set to 1 by controller
-        self.iofile_bundle.Members['Z'].verilog_io_condition_append(cond='&& initdone')
+        if self.lang == 'sv':
+            # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['A'].rtl_io_condition='initdone'
+            # Output is read to verilog simulation when all of the outputs are valid, 
+            # and after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='&& initdone')
+        elif self.lang == 'vhdl':
+            self.iofile_bundle.Members['A'].rtl_io_condition='(initdone = \'1\')'
+            # Output is read to verilog simulation when all of the outputs are valid, 
+            # and after 'initdone' is set to 1 by controller
+            self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='and initdone = \'1\'')
 
 if __name__=="__main__":
     import argparse
@@ -286,15 +308,17 @@ if __name__=="__main__":
 
     length=2**8
     rs=100e6
-    controller=inverter_controller()
+    lang='sv'
+    #Testbench vhdl
+    #lang='vhdl'
+    controller=inverter_controller(lang=lang)
     controller.Rs=rs
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
-
+    #models=['py','sv','icarus', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ngspice' ]
-    #models=['py','sv' 'icarus','vhdl','eldo','spectre']
+    models=['py', 'icarus', 'ngspice']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
@@ -305,6 +329,7 @@ if __name__=="__main__":
         d=inverter()
         duts.append(d) 
         d.model=model
+        d.lang=lang
         d.Rs=rs
         #d.preserve_rtlfiles = True
         # Enable debug messages
@@ -314,7 +339,7 @@ if __name__=="__main__":
         #d.interactive_rtl=True
         # Preserve the IO files or simulator files for debugging purposes
         #d.preserve_iofiles = True
-        # d.preserve_spicefiles = True
+        #d.preserve_spicefiles = True
         # Save the entity state after simulation
         #d.save_state = True
         #d.save_database = True
