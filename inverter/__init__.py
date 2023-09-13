@@ -40,6 +40,7 @@ if not (os.path.abspath('../../thesdk') in sys.path):
 from thesdk import *
 from rtl import *
 from spice import *
+import traceback
 
 import numpy as np
 
@@ -138,142 +139,148 @@ class inverter(rtl,spice,thesdk):
                 and it is assigned to self.queue and self.par is set to True. 
         
         '''
-        if self.model=='py':
-            self.main()
-        else: 
-            # This defines contents of modelsim control file executed when interactive_rtl = True
-            # Interactive control files
-            if self.model == 'icarus' or self.model == 'ghdl':
-                self.interactive_control_contents="""
-                    set io_facs [list] 
-                    lappend io_facs "tb_inverter.A"
-                    lappend io_facs "tb_inverter.Z" 
-                    lappend io_facs "tb_inverter.clock"
-                    gtkwave::addSignalsFromList $io_facs 
-                    gtkwave::/Time/Zoom/Zoom_Full
-                """
-            else:
-                self.interactive_control_contents="""
-                    add wave \\
-                    sim/:tb_inverter:A \\
-                    sim/:tb_inverter:initdone \\
-                    sim/:tb_inverter:clock \\
-                    sim/:tb_inverter:Z
-                    run -all
-                    wave zoom full
-                """
-
-            if self.model == 'ghdl':
-                # With this structure you can control the signals to be dumped to VCD 
-                #pass
-                self.simulator_control_contents=("version = 1.1  # Optional\n"
-                + "/tb_inverter/A\n"
-                + "/tb_inverter/Z\n"
-                + "/tb_inverter/clock\n"
-                                                 )
-
-            if self.model in ['sv', 'icarus']:
-                # Verilog simulation options here
-                _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
-                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
-                # This is to avoid sampling time confusion with Icarus
-                if self.lang == 'sv':
-                    f.rtl_io_sync='@(negedge clock)'
-                elif self.lang == 'vhdl':
-                    f.rtl_io_sync='falling_edge(clock)'
-
-                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
-                self.run_rtl()
-                self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
-            elif self.model=='vhdl' or self.model == 'ghdl':
-                # VHDL simulation options here
-                _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
-                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
-                if self.lang == 'sv':
-                    f.rtl_io_sync='@(negedge clock)'
-                elif self.lang == 'vhdl':
-                    f.rtl_io_sync='falling_edge(clock)'
-                self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
-                self.run_rtl()
-                self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
-            elif self.model in ['eldo','spectre','ngspice']:
-
-                # Creating a clock signal, which is used for testing the sample output features
-                _=spice_iofile(self, name='CLK', dir='in', iotype='sample', ionames='CLK', rs=2*self.Rs, \
-                               vhi=self.vdd, trise=1/(self.Rs*8), tfall=1/(self.Rs*8))
-                # Sample type input
-                _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames='A', rs=self.Rs, \
-                               vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
-
-                # These are helper IOS for analog simulation
-                _=spice_iofile(self, name='Z_ANA', dir='out', iotype='event', sourcetype='V', ionames='Z')
-                
-                # Sample type output
-                # Clock is used to sample the waveform in analog simulation
-                _=spice_iofile(self, name='Z', dir='out', iotype='sample', ionames='Z', trigger='CLK', \
-                               vth=self.vdd/2,edgetype='rising',ioformat='dec')
-                
-
-                # Saving the analog waveform of the input as well
-                _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames='A')
-
-                # For Extracting rising edges from the output waveform
-                _=spice_iofile(self, name='Z_RISE', dir='out', iotype='time', sourcetype='V', ionames='Z', \
-                               edgetype='rising',vth=self.vdd/2)
-
-
-                ## Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
-                ## The clock signal can be any node voltage in the simulation
-                _=spice_iofile(self, name='A_DIG', dir='out', iotype='sample', ionames='A', trigger='CLK', \
-                               vth=self.vdd/2,edgetype='rising',ioformat='dec')
-
-                # Multithreading, options and parameters
-                self.nproc = 2
-                self.spiceoptions = {
-                            'eps': '1e-6'
-                        }
-                self.spiceparameters = {
-                            'exampleparam': '0'
-                        }
-
-                # Defining library options
-                # Path to model libraries needs to be defined in TheSDK.config as
-                # either ELDOLIBFILE or SPECTRELIBFILE. In this case, no model libraries
-                # will be included (assuming these variables are not defined). The
-                # temperature will be set regardless.
-                self.spicecorner = {
-                            'corner': 'top_tt',
-                            'temp': 27,
-                        }
-
-                # Example of defining supplies (not used here because the example inverter has no supplies)
-                _=spice_dcsource(self,name='supply',value=self.vdd,pos='VDD',neg='VSS',extract=True)
-                _=spice_dcsource(self,name='ground',value=0,pos='VSS',neg='0')
-
-                # Adding a resistor between VDD and VSS to demonstrate power consumption extraction
-                # This also demonstrates how to inject manual commands in to the testbench
-                if self.model=='spectre':
-                    self.spicemisc.append('simulator lang=spice')
-                self.spicemisc.append('Rtest VDD VSS 2000')
-                if self.model=='spectre':
-                    self.spicemisc.append('simulator lang=spectre')
-                
-                # Plotting nodes for interactive waveform viewing.
-                # Spectre also supported, but without 'v()' specifiers.
-                # i.e. plotlist = ['A','Z']
-                if self.model == 'eldo':
-                    plotlist = ['v(A)','v(Z)']
-                elif self.model == 'spectre':
-                    plotlist = ['A','Z']
+        try:
+            if self.model=='py':
+                self.main()
+            else: 
+                # This defines contents of modelsim control file executed when interactive_rtl = True
+                # Interactive control files
+                if self.model == 'icarus' or self.model == 'ghdl':
+                    self.interactive_control_contents="""
+                        set io_facs [list] 
+                        lappend io_facs "tb_inverter.A"
+                        lappend io_facs "tb_inverter.Z" 
+                        lappend io_facs "tb_inverter.clock"
+                        gtkwave::addSignalsFromList $io_facs 
+                        gtkwave::/Time/Zoom/Zoom_Full
+                    """
                 else:
-                    plotlist = []
+                    self.interactive_control_contents="""
+                        add wave \\
+                        sim/:tb_inverter:A \\
+                        sim/:tb_inverter:initdone \\
+                        sim/:tb_inverter:clock \\
+                        sim/:tb_inverter:Z
+                        run -all
+                        wave zoom full
+                    """
 
-                # Simulation command
-                _=spice_simcmd(self,sim='tran',plotlist=plotlist)
-                self.run_spice()
+                if self.model == 'ghdl':
+                    # With this structure you can control the signals to be dumped to VCD 
+                    #pass
+                    self.simulator_control_contents=("version = 1.1  # Optional\n"
+                    + "/tb_inverter/A\n"
+                    + "/tb_inverter/Z\n"
+                    + "/tb_inverter/clock\n"
+                                                     )
 
+                if self.model in ['sv', 'icarus']:
+                    # Verilog simulation options here
+                    _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
+                    f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                    # This is to avoid sampling time confusion with Icarus
+                    if self.lang == 'sv':
+                        f.rtl_io_sync='@(negedge clock)'
+                    elif self.lang == 'vhdl':
+                        f.rtl_io_sync='falling_edge(clock)'
+
+                    self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
+                    self.run_rtl()
+                    self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data[:,0].astype(int).reshape(-1,1)
+                elif self.model=='vhdl' or self.model == 'ghdl':
+                    # VHDL simulation options here
+                    _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A']) # IO file for input A
+                    f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='int')
+                    if self.lang == 'sv':
+                        f.rtl_io_sync='@(negedge clock)'
+                    elif self.lang == 'vhdl':
+                        f.rtl_io_sync='falling_edge(clock)'
+                    self.rtlparameters=dict([ ('g_Rs',('real',self.Rs)),]) # Defines the sample rate
+                    self.run_rtl()
+                    self.IOS.Members['Z'].Data=self.IOS.Members['Z'].Data.astype(int).reshape(-1,1)
+                elif self.model in ['eldo','spectre','ngspice']:
+
+                    # Creating a clock signal, which is used for testing the sample output features
+                    _=spice_iofile(self, name='CLK', dir='in', iotype='sample', ionames='CLK', rs=2*self.Rs, \
+                                   vhi=self.vdd, trise=1/(self.Rs*8), tfall=1/(self.Rs*8))
+                    # Sample type input
+                    _=spice_iofile(self, name='A', dir='in', iotype='sample', ionames='A', rs=self.Rs, \
+                                   vhi=self.vdd, trise=1/(self.Rs*4), tfall=1/(self.Rs*4))
+
+                    # These are helper IOS for analog simulation
+                    _=spice_iofile(self, name='Z_ANA', dir='out', iotype='event', sourcetype='V', ionames='Z')
+                    
+                    # Sample type output
+                    # Clock is used to sample the waveform in analog simulation
+                    _=spice_iofile(self, name='Z', dir='out', iotype='sample', ionames='Z', trigger='CLK', \
+                                   vth=self.vdd/2,edgetype='rising',ioformat='dec')
+                    
+
+                    # Saving the analog waveform of the input as well
+                    _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames='A')
+
+                    # For Extracting rising edges from the output waveform
+                    _=spice_iofile(self, name='Z_RISE', dir='out', iotype='time', sourcetype='V', ionames='Z', \
+                                   edgetype='rising',vth=self.vdd/2)
+
+
+                    ## Extracting values of A and Z at falling edges of CLK in decimal format (integer, in this case 0 or 1)
+                    ## The clock signal can be any node voltage in the simulation
+                    _=spice_iofile(self, name='A_DIG', dir='out', iotype='sample', ionames='A', trigger='CLK', \
+                                   vth=self.vdd/2,edgetype='rising',ioformat='dec')
+
+                    # Multithreading, options and parameters
+                    self.nproc = 2
+                    self.spiceoptions = {
+                                'eps': '1e-6'
+                            }
+                    self.spiceparameters = {
+                                'exampleparam': '0'
+                            }
+
+                    # Defining library options
+                    # Path to model libraries needs to be defined in TheSDK.config as
+                    # either ELDOLIBFILE or SPECTRELIBFILE. In this case, no model libraries
+                    # will be included (assuming these variables are not defined). The
+                    # temperature will be set regardless.
+                    self.spicecorner = {
+                                'corner': 'top_tt',
+                                'temp': 27,
+                            }
+
+                    # Example of defining supplies (not used here because the example inverter has no supplies)
+                    _=spice_dcsource(self,name='supply',value=self.vdd,pos='VDD',neg='VSS',extract=True)
+                    _=spice_dcsource(self,name='ground',value=0,pos='VSS',neg='0')
+
+                    # Adding a resistor between VDD and VSS to demonstrate power consumption extraction
+                    # This also demonstrates how to inject manual commands in to the testbench
+                    if self.model=='spectre':
+                        self.spicemisc.append('simulator lang=spice')
+                    self.spicemisc.append('Rtest VDD VSS 2000')
+                    if self.model=='spectre':
+                        self.spicemisc.append('simulator lang=spectre')
+                    
+                    # Plotting nodes for interactive waveform viewing.
+                    # Spectre also supported, but without 'v()' specifiers.
+                    # i.e. plotlist = ['A','Z']
+                    if self.model == 'eldo':
+                        plotlist = ['v(A)','v(Z)']
+                    elif self.model == 'spectre':
+                        plotlist = ['A','Z']
+                    else:
+                        plotlist = []
+
+                    # Simulation command
+                    _=spice_simcmd(self,sim='tran',plotlist=plotlist)
+                    self.run_spice()
+                    if self.par:
+                        self.queue.put({**self.IOS.Members, **self.extracts.Members})
+        except:
             if self.par:
-                self.queue.put(self.IOS.Members)
+                self.queue.put({**self.IOS.Members, **self.extracts.Members})
+            self.print_log(type='W', msg='Something went wrong with running the simulation')
+            self.print_log(type='W', msg=traceback.format_exc())
+
 
     def define_io_conditions(self):
         '''This overloads the method called by run_rtl method. It defines the read/write conditions for the files
