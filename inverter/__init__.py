@@ -170,7 +170,15 @@ class inverter(rtl,spice,thesdk):
                 + "/tb_inverter/A\n"
                 + "/tb_inverter/Z\n"
                 + "/tb_inverter/clock\n"
-                                                 )
+                )
+
+            if self.model == 'sv': 
+                self.simulator_control_contents = ("vcd file %s/inverter_dump.vcd\n" %(self.rtlsimpath)
+                + "vcd add -r *\n"
+                + "vcd on\n"
+                + "run -all\n"
+                + "quit\n"
+                )
 
             if self.model in ['sv', 'icarus']:
                 # Verilog simulation options here
