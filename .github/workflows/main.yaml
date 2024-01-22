@@ -18,4 +18,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Documentation builder action
-        run:  cd doc && make html && cd ..
+        run:  cd doc && make html && cd .. && rm -rf ./docs && mv ./doc/build/html/* ./docs/
