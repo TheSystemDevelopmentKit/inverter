@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Documentation builder action
-        run:  cd doc && rm -rf build && make html && cd .. && touch ./build/html/.nojekyll
+        run:  cd doc && rm -rf build && make html && cd .. && touch ./doc//build/html/.nojekyll
       - name: GIT commit and push documentation
         env:
               CI_COMMIT_MESSAGE: Continuous Integration documentation update
