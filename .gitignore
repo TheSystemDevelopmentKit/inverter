@@ -1,6 +1,5 @@
 Makefile
 **/__pycache__
-doc/build/*
 *.eps
 *.pdf
 *~

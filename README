@@ -1,0 +1,12 @@
+# Documentation
+
+Default page, if exists, is https://TheSystemDevelopmentKit.github.io/inverter/
+
+The 'docs' directory is a symbolic link to doc/build/html for github CI documentation builds.
+
+Github documentation flow is defined in .github/workflows/main.yaml
+
+The file ./doc/build/html.nojekyll is mandatory for Gitlab pages to parse
+files and directories starting with '_'.
+
+

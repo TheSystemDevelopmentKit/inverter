@@ -1,7 +1,8 @@
 on: 
   push:
     branches:
-      - v1.9_RC
+      - master
+      - v1.11_RC
 
 jobs:
   doc_build_job:
@@ -9,32 +10,12 @@ jobs:
     # This project MUST be given permission to use the image blow. at
     # Package settings-> Manage action access of the project hosting the
     # package
+    # Your project MUSTT contain empty .nojekyll file. Github Pages will
+    # discard everything starting with '_' i.e. the stylefiles.
     container: 'ghcr.io/thesystemdevelopmentkit/thesdktestimage:latest'
-    name: Test the submodules and Update the thesdk_template
+    name: Build documentation
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Test and update
-        run: ./CI-helpers/test_and_release.sh -c -b "v1.9_RC" -t ${{ secrets.THESYDEKICK_TOKEN }}
-
-## This is an example how to run a image pull if needed.
-#  image_pull:
-#    runs-on: ubuntu-latest
-#    name: Pull docker image
-#    steps:
-#      - name: Login to Github Packages
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN}}
-#
-#      - name: Pull image
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN}}
-#      - name: Pull Docker image
-#        run: docker pull 'ghcr.io/thesystemdevelopmentkit/thesdktestimage:latest'
-
+      - name: Documentation builder action
+        run:  cd doc && make html && cd .. && rm -rf ./docs && mv ./doc/build/html/* ./docs/
