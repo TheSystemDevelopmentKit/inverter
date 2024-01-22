@@ -23,10 +23,5 @@ jobs:
         env:
               CI_COMMIT_MESSAGE: Continuous Integration documentation update
               CI_COMMIT_AUTHOR: Continuous Integration
-        run: |
-        git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-        git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
-        git add docs
-        git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-        git push
+        run: git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}" && git config --global user.email "${GITHUB_ACTOR}@noreply.github.com" && git add docs && git commit -m "${{ env.CI_COMMIT_MESSAGE }}" && git push
 
