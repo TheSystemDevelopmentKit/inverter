@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Documentation builder action
-        run:  cd doc && make html && cd .. && rm -rf ./docs && mv doc/build/html ./docs/ && touch ./docs/.nojekyll && touch ./docs/.gitignore
+        run:  cd doc && make html && cd .. && touch ./doc/build/html/.nojekyll
       - name: GIT commit and push documentation
         env:
               CI_COMMIT_MESSAGE: Continuous Integration documentation update
@@ -34,7 +34,7 @@ jobs:
           git config --global --add safe.directory /__w/inverter/inverter
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
-          git add docs \
+          git add doc \
             && git commit -m "${{ env.CI_COMMIT_MESSAGE }}" \
             && git push \
             || echo "Nothing to update"
@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: './docs'
+          path: './doc/build/html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
