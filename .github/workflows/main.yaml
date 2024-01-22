@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Documentation builder action
-        run:  cd doc && make html && cd .. && mv ./doc/build/html/* ./docs/
+        run:  cd doc && make html && cd ..
       - name: GIT commit and push documentation
         env:
               CI_COMMIT_MESSAGE: Continuous Integration documentation update
