@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inverter class &mdash; inverter 1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Indices and tables" href="indices_and_tables.html" />
+    <link rel="prev" title="Inverter" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            inverter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inverter class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inverter">Inverter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#role-of-section-if-name-main">Role of section ‘if __name__==”__main__”’</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#inverter.inverter"><code class="docutils literal notranslate"><span class="pre">inverter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.__init__"><code class="docutils literal notranslate"><span class="pre">inverter.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.proplist"><code class="docutils literal notranslate"><span class="pre">inverter.proplist</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.Rs"><code class="docutils literal notranslate"><span class="pre">inverter.Rs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.vdd"><code class="docutils literal notranslate"><span class="pre">inverter.vdd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.IOS"><code class="docutils literal notranslate"><span class="pre">inverter.IOS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.model"><code class="docutils literal notranslate"><span class="pre">inverter.model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.define_io_conditions"><code class="docutils literal notranslate"><span class="pre">inverter.define_io_conditions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.init"><code class="docutils literal notranslate"><span class="pre">inverter.init()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.main"><code class="docutils literal notranslate"><span class="pre">inverter.main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inverter.inverter.run"><code class="docutils literal notranslate"><span class="pre">inverter.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="indices_and_tables.html">Indices and tables</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">inverter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Inverter class</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sections.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="inverter-class">
+<h1>Inverter class<a class="headerlink" href="#inverter-class" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="inverter">
+<span id="module-inverter"></span><h2>Inverter<a class="headerlink" href="#inverter" title="Link to this heading"></a></h2>
+<p>Inverter model template The System Development Kit
+Used as a template for all TheSyDeKick Entities.</p>
+<p>Current docstring documentation style is Numpy
+<a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">https://numpydoc.readthedocs.io/en/latest/format.html</a></p>
+<p>For reference of the markup syntax
+<a class="reference external" href="https://docutils.sourceforge.io/docs/user/rst/quickref.html">https://docutils.sourceforge.io/docs/user/rst/quickref.html</a></p>
+<p>This text here is to remind you that documentation is important.
+However, youu may find it out the even the documentation of this
+entity may be outdated and incomplete. Regardless of that, every day
+and in every way we are getting better and better :).</p>
+<p>Initially written by Marko Kosunen, <a class="reference external" href="mailto:marko&#46;kosunen&#37;&#52;&#48;aalto&#46;fi">marko<span>&#46;</span>kosunen<span>&#64;</span>aalto<span>&#46;</span>fi</a>, 2017.</p>
+<section id="role-of-section-if-name-main">
+<h3>Role of section ‘if __name__==”__main__”’<a class="headerlink" href="#role-of-section-if-name-main" title="Link to this heading"></a></h3>
+<p>This section is for self testing and interfacing of this class. The content of
+it is fully up to designer. You may use it for example to test the
+functionality of the class by calling it as <code class="docutils literal notranslate"><span class="pre">pyhon3</span> <span class="pre">__init__.py</span></code> or you may
+define how it handles the arguments passed during the invocation. In this
+example it is used as a complete self test script for all the simulation models
+defined for the inverter.</p>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="inverter.inverter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">inverter.</span></span><span class="sig-name descname"><span class="pre">inverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="inverter.inverter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter.__init__" title="Link to this definition"></a></dt>
+<dd><p>Inverter parameters and attributes
+:param *arg:
+:param If any arguments are defined:
+:param the first one should be the parent instance:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inverter.inverter.proplist">
+<span class="sig-name descname"><span class="pre">proplist</span></span><a class="headerlink" href="#inverter.inverter.proplist" title="Link to this definition"></a></dt>
+<dd><p>List of strings containing the names of attributes whose values are to be copied
+from the parent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array_like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inverter.inverter.Rs">
+<span class="sig-name descname"><span class="pre">Rs</span></span><a class="headerlink" href="#inverter.inverter.Rs" title="Link to this definition"></a></dt>
+<dd><p>Sampling rate [Hz] of which the input values are assumed to change. Default: 100.0e6</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inverter.inverter.vdd">
+<span class="sig-name descname"><span class="pre">vdd</span></span><a class="headerlink" href="#inverter.inverter.vdd" title="Link to this definition"></a></dt>
+<dd><p>Supply voltage [V] for inverter analog simulation. Default 1.0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inverter.inverter.IOS">
+<span class="sig-name descname"><span class="pre">IOS</span></span><a class="headerlink" href="#inverter.inverter.IOS" title="Link to this definition"></a></dt>
+<dd><p>Members of this bundle are the IO’s of the entity. See documentation of thsdk package.
+Default members defined as</p>
+<p>self.IOS.Members[‘A’]=IO() # Pointer for input data
+self.IOS.Members[‘Z’]= IO() # pointer for oputput data
+self.IOS.Members[‘control_write’]= IO() # Piter for control IO for rtl simulations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bundle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inverter.inverter.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#inverter.inverter.model" title="Link to this definition"></a></dt>
+<dd><p>Default ‘py’ for Python. See documentation of thsdk package for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="inverter.inverter.define_io_conditions">
+<span class="sig-name descname"><span class="pre">define_io_conditions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter.define_io_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter.define_io_conditions" title="Link to this definition"></a></dt>
+<dd><p>This overloads the method called by run_rtl method. It defines the read/write conditions for the files</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="inverter.inverter.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter.init" title="Link to this definition"></a></dt>
+<dd><p>Method to re-initialize the structure if the attribute values are changed after creation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="inverter.inverter.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter.main" title="Link to this definition"></a></dt>
+<dd><p>The main python description of the operation. Contents fully up to designer, however, the
+IO’s should be handled bu following this guideline:</p>
+<p>To isolate the internal processing from IO connection assigments,
+The procedure to follow is
+1) Assign input data from input to local variable
+2) Do the processing
+3) Assign local variable to output</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="inverter.inverter.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/inverter.html#inverter.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inverter.inverter.run" title="Link to this definition"></a></dt>
+<dd><p>The default name of the method to be executed. This means: parameters and attributes
+control what is executed if run method is executed. By this we aim to avoid the need of
+documenting what is the execution method. It is always self.run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*arg</strong> – The first argument is assumed to be the queue for the parallel processing defined in the parent,
+and it is assigned to self.queue and self.par is set to True.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Inverter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="indices_and_tables.html" class="btn btn-neutral float-right" title="Indices and tables" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019 TheSyDeKick Community.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
