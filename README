@@ -9,6 +9,4 @@ Github documentation flow is defined in .github/workflows/main.yaml
 The file ./doc/build/html.nojekyll is mandatory for Gitlab pages to parse
 files and directories starting with '_'.
 
-Trial2
-
 
