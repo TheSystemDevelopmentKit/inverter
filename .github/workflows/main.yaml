@@ -34,7 +34,7 @@ jobs:
           git config --global --add safe.directory /__w/inverter/inverter
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${GITHUB_ACTOR}@noreply.github.com"
-          git add doc/build \
+          git add doc/build/html \
             && git commit -m "${{ env.CI_COMMIT_MESSAGE }}" \
             && git push \
             || echo "Nothing to update"
