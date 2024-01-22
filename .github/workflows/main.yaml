@@ -10,7 +10,7 @@ jobs:
     # This project MUST be given permission to use the image blow. at
     # Package settings-> Manage action access of the project hosting the
     # package
-    # Your project MUSTT contain empty .nojekyll file. Github Pages will
+    # Your project MUST contain empty .nojekyll file. Github Pages will
     # discard everything starting with '_' i.e. the stylefiles.
     container: 'ghcr.io/thesystemdevelopmentkit/thesdktestimage:latest'
     name: Build documentation
@@ -18,4 +18,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Documentation builder action
-        run:  cd doc && make html && cd .. && rm -rf ./docs && mv ./doc/build/html/* ./docs/
+        run:  cd doc && make html && cd .. && mv ./doc/build/html/* ./docs/
