@@ -180,7 +180,7 @@ class inverter(rtl,spice,thesdk):
                 + "quit\n"
                 )
 
-            if self.model in ['sv', 'icarus']:
+            if self.model in ['sv', 'icarus', 'verilator']:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
@@ -326,7 +326,8 @@ if __name__=="__main__":
     controller.start_datafeed()
     #models=['py','sv','icarus', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ghdl', 'ngspice']
+    #models=['py', 'icarus', 'ghdl', 'ngspice']
+    models=['verilator']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
