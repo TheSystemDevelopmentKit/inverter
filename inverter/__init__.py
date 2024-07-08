@@ -343,6 +343,7 @@ if __name__=="__main__":
         else:
             d.lang=lang
         d.Rs=rs
+        d.runname='verilator_test'
         #d.preserve_rtlfiles = True
         # Enable debug messages
         #d.DEBUG = True
