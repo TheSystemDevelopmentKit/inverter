@@ -122,9 +122,10 @@ class inverter(rtl,spice,thesdk):
         '''
         inval=self.IOS.Members['A'].Data
         out=np.array(1-inval)
-        if self.par:
-            self.queue.put(out)
         self.IOS.Members['Z'].Data=out
+        if self.par:
+            ret_dict=self.IOS.Members #Adds IOS to return dictionary
+            self.queue.put(ret_dict)
 
     def run(self,*arg):
         ''' The default name of the method to be executed. This means: parameters and attributes 
@@ -143,7 +144,7 @@ class inverter(rtl,spice,thesdk):
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
             # Interactive control files
-            if self.model == 'icarus' or self.model == 'ghdl':
+            if self.model in [ 'icarus', 'ghdl' ]:
                 self.interactive_control_contents="""
                     set io_facs [list] 
                     lappend io_facs "tb_inverter.A"
