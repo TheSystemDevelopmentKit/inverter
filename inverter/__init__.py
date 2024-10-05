@@ -144,7 +144,7 @@ class inverter(rtl,spice,thesdk):
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
             # Interactive control files
-            if self.model in [ 'icarus', 'ghdl', 'verilator' ]:
+            if self.model in [ 'icarus', 'verilator', 'ghdl']:
                 self.interactive_control_contents="""
                     set io_facs [list] 
                     lappend io_facs "tb_inverter.A"
@@ -181,7 +181,7 @@ class inverter(rtl,spice,thesdk):
                 + "quit\n"
                 )
 
-            if self.model in ['sv', 'icarus']:
+            if self.model in ['sv', 'icarus', 'verilator' ]:
                 # Verilog simulation options here
                 _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
                 f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
@@ -325,9 +325,9 @@ if __name__=="__main__":
     #controller.reset()
     #controller.step_time()
     controller.start_datafeed()
-    #models=['py','sv','icarus', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
+    #models=['py','sv','icarus', 'verilator', 'ghdl', 'vhdl','eldo','spectre', 'ngspice']
     #By default, we set only open souce simulators
-    models=['py', 'icarus', 'ghdl', 'ngspice']
+    models=['py', 'icarus', 'verilator', 'ghdl', 'ngspice']
     # Here we instantiate the signal source
     duts=[]
     plotters=[]
