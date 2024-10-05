@@ -144,7 +144,7 @@ class inverter(rtl,spice,thesdk):
         else: 
             # This defines contents of modelsim control file executed when interactive_rtl = True
             # Interactive control files
-            if self.model in [ 'icarus', 'ghdl' ]:
+            if self.model in [ 'icarus', 'ghdl', 'verilator' ]:
                 self.interactive_control_contents="""
                     set io_facs [list] 
                     lappend io_facs "tb_inverter.A"
