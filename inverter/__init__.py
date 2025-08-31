@@ -13,8 +13,8 @@ For reference of the markup syntax
 https://docutils.sourceforge.io/docs/user/rst/quickref.html
 
 This text here is to remind you that documentation is important.
-However, youu may find it out the even the documentation of this 
-entity may be outdated and incomplete. Regardless of that, every day 
+However, youu may find it out the even the documentation of this
+entity may be outdated and incomplete. Regardless of that, every day
 and in every way we are getting better and better :).
 
 Initially written by Marko Kosunen, marko.kosunen@aalto.fi, 2017.
@@ -28,7 +28,7 @@ it is fully up to designer. You may use it for example to test the
 functionality of the class by calling it as ``pyhon3 __init__.py`` or you may
 define how it handles the arguments passed during the invocation. In this
 example it is used as a complete self test script for all the simulation models
-defined for the inverter. 
+defined for the inverter.
 
 """
 
@@ -37,25 +37,25 @@ import sys
 if not (os.path.abspath('../../thesdk') in sys.path):
     sys.path.append(os.path.abspath('../../thesdk'))
 
-from thesdk import *
-from rtl import *
-from spice import *
+from thesdk import thesdk, IO
+from rtl import rtl, rtl_iofile
+from spice import spice, spice_iofile, spice_dcsource, spice_simcmd
 
 import numpy as np
 
 class inverter(rtl,spice,thesdk):
 
-    def __init__(self,*arg): 
+    def __init__(self,*arg):
         """ Inverter parameters and attributes
             Parameters
             ----------
-                *arg : 
+                *arg :
                 If any arguments are defined, the first one should be the parent instance
 
             Attributes
             ----------
             proplist : array_like
-                List of strings containing the names of attributes whose values are to be copied 
+                List of strings containing the names of attributes whose values are to be copied
                 from the parent
 
             Rs : float
@@ -76,7 +76,7 @@ class inverter(rtl,spice,thesdk):
                 Default 'py' for Python. See documentation of thsdk package for more details.
 
         """
-        self.print_log(type='I', msg='Initializing %s' %(__name__)) 
+        self.print_log(type='I', msg='Initializing %s' %(__name__))
         self.proplist = ['Rs', 'vdd'] # Properties that can be propagated from parent
         self.Rs = 100e6 # Sampling frequency
         self.vdd = 1.0
@@ -110,10 +110,10 @@ class inverter(rtl,spice,thesdk):
         pass #Currently nothing to add
 
     def main(self):
-        ''' The main python description of the operation. Contents fully up to designer, however, the 
+        ''' The main python description of the operation. Contents fully up to designer, however, the
         IO's should be handled bu following this guideline:
-        
-        To isolate the internal processing from IO connection assigments, 
+
+        To isolate the internal processing from IO connection assigments,
         The procedure to follow is
         1) Assign input data from input to local variable
         2) Do the processing
@@ -128,29 +128,29 @@ class inverter(rtl,spice,thesdk):
             self.queue.put(ret_dict)
 
     def run(self,*arg):
-        ''' The default name of the method to be executed. This means: parameters and attributes 
-            control what is executed if run method is executed. By this we aim to avoid the need of 
-            documenting what is the execution method. It is always self.run. 
+        ''' The default name of the method to be executed. This means: parameters and attributes
+            control what is executed if run method is executed. By this we aim to avoid the need of
+            documenting what is the execution method. It is always self.run.
 
             Parameters
             ----------
             *arg :
-                The first argument is assumed to be the queue for the parallel processing defined in the parent, 
-                and it is assigned to self.queue and self.par is set to True. 
-        
+                The first argument is assumed to be the queue for the parallel processing defined in the parent,
+                and it is assigned to self.queue and self.par is set to True.
+
         '''
         if self.model=='py':
             self.main()
-        else: 
+        else:
             # This defines contents of modelsim control file executed when interactive_rtl = True
             # Interactive control files
             if self.model in [ 'icarus', 'verilator', 'ghdl']:
                 self.interactive_control_contents="""
-                    set io_facs [list] 
+                    set io_facs [list]
                     lappend io_facs "tb_inverter.A"
-                    lappend io_facs "tb_inverter.Z" 
+                    lappend io_facs "tb_inverter.Z"
                     lappend io_facs "tb_inverter.clock"
-                    gtkwave::addSignalsFromList $io_facs 
+                    gtkwave::addSignalsFromList $io_facs
                     gtkwave::/Time/Zoom/Zoom_Full
                 """
             else:
@@ -165,7 +165,7 @@ class inverter(rtl,spice,thesdk):
                 """
 
             if self.model == 'ghdl':
-                # With this structure you can control the signals to be dumped to VCD 
+                # With this structure you can control the signals to be dumped to VCD
                 #pass
                 self.simulator_control_contents=("version = 1.1  # Optional\n"
                 + "/tb_inverter/A\n"
@@ -173,7 +173,7 @@ class inverter(rtl,spice,thesdk):
                 + "/tb_inverter/clock\n"
                 )
 
-            if self.model == 'sv': 
+            if self.model == 'sv':
                 self.simulator_control_contents = ("vcd file %s/inverter_dump.vcd\n" %(self.rtlsimpath)
                 + "vcd add -r *\n"
                 + "vcd on\n"
@@ -183,8 +183,8 @@ class inverter(rtl,spice,thesdk):
 
             if self.model in ['sv', 'icarus', 'verilator' ]:
                 # Verilog simulation options here
-                _=rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
-                f=rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
+                _ = rtl_iofile(self, name='A', dir='in', iotype='sample', ionames=['A'], datatype='sint') # IO file for input A
+                f = rtl_iofile(self, name='Z', dir='out', iotype='sample', ionames=['Z'], datatype='sint')
                 # This is to avoid sampling time confusion with Icarus
                 if self.lang == 'sv':
                     f.rtl_io_sync='@(negedge clock)'
@@ -216,12 +216,12 @@ class inverter(rtl,spice,thesdk):
 
                 # These are helper IOS for analog simulation
                 _=spice_iofile(self, name='Z_ANA', dir='out', iotype='event', sourcetype='V', ionames='Z')
-                
+
                 # Sample type output
                 # Clock is used to sample the waveform in analog simulation
                 _=spice_iofile(self, name='Z', dir='out', iotype='sample', ionames='Z', trigger='CLK', \
                                vth=self.vdd/2,edgetype='rising',ioformat='dec')
-                
+
 
                 # Saving the analog waveform of the input as well
                 _=spice_iofile(self, name='A_OUT', dir='out', iotype='event', sourcetype='V', ionames='A')
@@ -266,7 +266,7 @@ class inverter(rtl,spice,thesdk):
                 self.spicemisc.append('Rtest VDD VSS 2000')
                 if self.model=='spectre':
                     self.spicemisc.append('simulator lang=spectre')
-                
+
                 # Plotting nodes for interactive waveform viewing.
                 # Spectre also supported, but without 'v()' specifiers.
                 # i.e. plotlist = ['A','Z']
@@ -291,12 +291,12 @@ class inverter(rtl,spice,thesdk):
         if self.lang == 'sv':
             # Input A is read to verilog simulation after 'initdone' is set to 1 by controller
             self.iofile_bundle.Members['A'].rtl_io_condition='initdone'
-            # Output is read to verilog simulation when all of the outputs are valid, 
+            # Output is read to verilog simulation when all of the outputs are valid,
             # and after 'initdone' is set to 1 by controller
             self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='&& initdone')
         elif self.lang == 'vhdl':
             self.iofile_bundle.Members['A'].rtl_io_condition='(initdone = \'1\')'
-            # Output is read to verilog simulation when all of the outputs are valid, 
+            # Output is read to verilog simulation when all of the outputs are valid,
             # and after 'initdone' is set to 1 by controller
             self.iofile_bundle.Members['Z'].rtl_io_condition_append(cond='and initdone = \'1\'')
 
@@ -311,7 +311,7 @@ if __name__=="__main__":
 
     # Implement argument parser
     parser = argparse.ArgumentParser(description='Parse selectors')
-    parser.add_argument('--show', dest='show', type=bool, nargs='?', const = True, 
+    parser.add_argument('--show', dest='show', type=bool, nargs='?', const = True,
             default=False,help='Show figures on screen')
     args=parser.parse_args()
 
@@ -336,7 +336,7 @@ if __name__=="__main__":
     for model in models:
         # Create an inverter
         d=inverter()
-        duts.append(d) 
+        duts.append(d)
         d.model=model
         if model == 'ghdl':
             d.lang='vhdl'
@@ -364,7 +364,7 @@ if __name__=="__main__":
         d.IOS.Members['control_write']=controller.IOS.Members['control_write']
         ## Add plotters
         p=signal_plotter()
-        plotters.append(p) 
+        plotters.append(p)
         p.plotmodel=d.model
         p.plotvdd=d.vdd
         p.Rs = rs
@@ -374,7 +374,7 @@ if __name__=="__main__":
         p.IOS.Members['A_DIG']=d.IOS.Members['A_DIG']
         p.IOS.Members['Z_ANA']=d.IOS.Members['Z_ANA']
         p.IOS.Members['Z_RISE']=d.IOS.Members['Z_RISE']
-        
+
 
     # Here we run the instances
     s_source.run() # Creates the data to the output
@@ -386,7 +386,7 @@ if __name__=="__main__":
         p.run()
 
      #This is here to keep the images visible
-     #For batch execution, you should comment the following line 
+     #For batch execution, you should comment the following line
     if args.show:
        input()
     #This is to have exit status for succesfuulexecution
