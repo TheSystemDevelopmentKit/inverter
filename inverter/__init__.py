@@ -46,12 +46,6 @@ from spice import spice, spice_iofile, spice_dcsource, spice_simcmd
 import numpy as np
 
 
-
-
-
-
-
-
 class inverter(rtl, spice, thesdk):
 
     def __init__(self, *arg):
