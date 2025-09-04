@@ -500,7 +500,7 @@ if __name__ == "__main__":
         p.init()
         p.run()
 
-    # This is here to keep the images visible
+    # This is here to keep the images visible for observations
     # For batch execution, you should comment the following line
     if args.show:
         input()
