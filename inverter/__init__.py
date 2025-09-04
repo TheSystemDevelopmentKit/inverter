@@ -504,5 +504,5 @@ if __name__ == "__main__":
     # For batch execution, you should comment the following line
     if args.show:
         input()
-    # This is to have exit status for succesfuulexecution
+    # This is to have exit status for succesfull execution
     sys.exit(0)
