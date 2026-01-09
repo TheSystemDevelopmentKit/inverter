@@ -20,14 +20,13 @@ Initially written by Marko Kosunen, marko.kosunen@aalto.fi, 2022.
 import os
 import sys
 
-if not (os.path.abspath("../../thesdk") in sys.path):
+if os.path.abspath("../../thesdk") not in sys.path:
     sys.path.append(os.path.abspath("../../thesdk"))
 
-from thesdk import *
+from thesdk import thesdk, IO
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pdb
 
 
 class signal_plotter(thesdk):

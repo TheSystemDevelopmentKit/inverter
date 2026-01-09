@@ -35,7 +35,7 @@ defined for the inverter.
 import os
 import sys
 
-if not (os.path.abspath("../../thesdk") in sys.path):
+if os.path.abspath("../../thesdk") not in sys.path:
     sys.path.append(os.path.abspath("../../thesdk"))
 
 from thesdk import thesdk, IO
@@ -47,7 +47,6 @@ import numpy as np
 
 
 class inverter(rtl, spice, thesdk):
-
     def __init__(self, *arg):
         """Inverter parameters and attributes
         Parameters
@@ -249,7 +248,6 @@ class inverter(rtl, spice, thesdk):
                     self.IOS.Members["Z"].Data.astype(int).reshape(-1, 1)
                 )
             elif self.model in ["eldo", "spectre", "ngspice"]:
-
                 # Creating a clock signal, which is used for testing the sample output features
                 _ = spice_iofile(
                     self,
@@ -411,12 +409,10 @@ class inverter(rtl, spice, thesdk):
 
 if __name__ == "__main__":
     import argparse
-    import matplotlib.pyplot as plt
-    from inverter import *
+    from inverter import inverter
     from inverter.controller import controller as inverter_controller
     from inverter.signal_source import signal_source
     from inverter.signal_plotter import signal_plotter
-    import pdb
 
     # Implement argument parser
     parser = argparse.ArgumentParser(description="Parse selectors")

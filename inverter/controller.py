@@ -4,9 +4,9 @@ import os
 
 
 import numpy as np
-from thesdk import *
-from rtl import *
-from rtl.module import *
+from thesdk import IO, Bundle
+from rtl import rtl, rtl_iofile, rtl_connector_bundle
+from rtl.module import verilog_module, vhdl_entity
 
 
 class controller(rtl):
