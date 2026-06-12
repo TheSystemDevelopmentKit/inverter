@@ -9,4 +9,8 @@ Github documentation flow is defined in .github/workflows/main.yaml
 The file ./doc/build/html.nojekyll is mandatory for Gitlab pages to parse
 files and directories starting with '_'.
 
+# Git hoooks
+
+Git hooks are stored in .githooks and configured with
+```git config --local core.hooksPath .githooks/```
 
